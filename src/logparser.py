@@ -1,16 +1,10 @@
 import datetime
 import time
 
-states = {
-      'ON': ['OFF'],
-      'OFF': '',
-      'ERR': ''
- }
-
 def logLoader(path):
     allLines = []
     with open(path) as file:
-        for line in file: #.readline():
+        for line in file:
             allLines.append(LogLine(line))
     return allLines
 
@@ -28,59 +22,32 @@ class LogLine():
     def getLogLineElements(self, logLine):
         elements = logLine.split()
         try:
-            timeStamp = self.parseStringToTime(elements[0:3]) 
+            timeStamp = self.parseStringToTime(elements[0]) 
         except IndexError:  
             timeStamp = ''
 
-        elements = logLine.split('dut:')
         try: 
-            payload = elements[1]
+            startIndex = logLine.find('[', 0)
+            payload = logLine[startIndex:]
         except IndexError:
             payload = ''
 
         return (timeStamp, payload)
 
-    def parseStringToTime(self, date_args):
-        defaultYear = '2020'
-        actualMonth = self.getMonthIndex(date_args[0]) 
-        day = date_args[1]
-
-        timeOfDayElements = date_args[2].split(':') 
-        hour = timeOfDayElements[0]
-        minutes = timeOfDayElements[1]
-        seconds = timeOfDayElements[2]
-        miliseconds = timeOfDayElements[3] + '000'
-
-        timeString = defaultYear + '-' + actualMonth + '-' + day + '-' + hour + ':' + minutes + ':' + seconds + ':' + miliseconds
-
-        date = datetime.datetime.strptime(timeString, "%Y-%m-%d-%H:%M:%S:%f")
-        return date.timestamp()
-
-    def getMonthIndex(self, monthName):
-        monthIndex = {
-            'jan': 1,
-            'feb': 2,
-            'mar': 3,
-            'april': 4,
-            'may': 5,
-            'jun': 6,
-            'jul': 7,
-            'aug': 8,
-            'sept': 9,
-            'oct': 10,
-            'nov': 11,
-            'dec': 12
-        }
+    def parseStringToTime(self, date_args): #date_args = '2020-09-04-18:16:12.1515421'
         try:
-            return str(monthIndex[monthName.lower()]) 
-        except:
-            return 1
+            timeString = date_args.replace('T', '-')
+            timeString = timeString[0:26] # remove '+02:00' + trim milisec part down
 
+            date = datetime.datetime.strptime(timeString, "%Y-%m-%d-%H:%M:%S.%f")
+            return date.timestamp() # convert to UNIX time
+        except:
+            return ''
     
 def ParseLog(searchTerm, filePath):
     log = logLoader(filePath)
     for logLine in log:
-        if logLine.GetPayLoad().find(searchTerm) > 0:
+        if logLine.GetPayLoad().find(searchTerm) > -1:
             print(logLine.GetTimeStamp(), logLine.GetPayLoad())
 
-ParseLog('Device State:', './testSources/logfile.log')
+ParseLog('WRN', './testSources/GalaxySiteSelector-JAKOB-LAPTOP-20200904.log')
