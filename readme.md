@@ -39,3 +39,37 @@ We're looking for data such as:
 ### Data ###
 
 The target-app will respond to REST-queries, and return requested data. The log-data should be fetched via REST, by querying all instances of target-app and request they submit all log-files. LogParser should only acquire new-to-it files, or log-files updated since last run.
+
+
+
+### Development agenda - Tech ###
+
+In order to get useful stats from the log-file collection, I expect to use various sorting and tree-search algorithms to generate the reports.
+
+
+
+### Development agenda - Slices ###
+
+The first 4 sub-goals of the initial development phase can be identified so:
+
+####  Phase 1 ####
+
+- Using local files as source. 
+- Represent logs as one list pr. client. 
+- Parse timestamp of each log-line into epoch. 
+- Make text-part searchable and demonstrate simple text-pattern search
+
+####  Phase 2 ####  
+
+- Be able to generate report on statistics of service-interaction on target-app.
+- Min, Max, Average response times across all sampled logs.
+
+####  Phase 3 ####  
+
+- MVP: Be able to generate additional text-based reporting, on critical KPI's as described above.
+
+- Nice-to-have: generate a number of graphics-based reports.
+
+####  Phase 4 ####
+
+- Implement logfile acquisition from clients via REST
