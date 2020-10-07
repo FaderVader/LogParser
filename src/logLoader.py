@@ -15,6 +15,8 @@ def LoadAllLogs(logList):
 
     # load all logs
     for logfile in logList:
+
+        # log-lines should eventually be stored by {clientname: {filename: [loglines ]}}
         logs.append(loadOneLogfile(basePath + logfile + extension))
     return logs
 
@@ -26,13 +28,3 @@ def SearchLogsForPhrase(searchPhrase, logs):
             if logLine.GetPayLoad().find(searchPhrase) > -1:
                 hits.append((logLine.GetTimeStamp(), logLine.GetPayLoad())) # store as tuple
     return hits
-
-
-def executeSearch(searchPhrase, messageLength, logList):
-    allLogs = LoadAllLogs(logList)
-    hits = SearchLogsForPhrase(searchPhrase, allLogs)
-
-    print(f'Matches found: {len(hits)}')
-
-    for hit in hits:
-        print(f'time:{hit[0]} - message: {hit[1][0: messageLength]}')
