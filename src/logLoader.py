@@ -1,7 +1,6 @@
-import datetime
-import time
+from LogLine import LogLine
 
-def logLoader(path):
+def loadOneLogfile(path):
     allLines = []
     with open(path) as file:
         for line in file:
@@ -9,37 +8,31 @@ def logLoader(path):
     return allLines
 
 
-class LogLine():
-    def __init__(self, logLine):
-        self.lineElements = self.getLogLineElements(logLine)
+def LoadAllLogs(logList):
+    logs = []
+    basePath = './testSources/' # run = '../'    debug = './'
+    extension = '.log'
 
-    def GetTimeStamp(self):
-        return self.lineElements[0]
+    # load all logs
+    for logfile in logList:
+        logs.append(loadOneLogfile(basePath + logfile + extension))
+    return logs
 
-    def GetPayLoad(self):
-        return self.lineElements[1]
-    
-    def getLogLineElements(self, logLine):
-        elements = logLine.split()
-        try:
-            timeStamp = self.parseStringToTime(elements[0]) 
-        except IndexError:  
-            timeStamp = ''
 
-        try: 
-            startIndex = logLine.find('[', 0)
-            payload = logLine[startIndex:]
-        except IndexError:
-            payload = ''
+def SearchLogsForPhrase(searchPhrase, logs):
+    hits = []
+    for log in logs:
+        for logLine in log:
+            if logLine.GetPayLoad().find(searchPhrase) > -1:
+                hits.append((logLine.GetTimeStamp(), logLine.GetPayLoad())) # store as tuple
+    return hits
 
-        return (timeStamp, payload)
 
-    def parseStringToTime(self, date_args): #date_args = '2020-09-04-18:16:12.1515421'
-        try:
-            timeString = date_args.replace('T', '-')
-            timeString = timeString[0:26] # remove '+02:00' + trim milisec part down
+def executeSearch(searchPhrase, messageLength, logList):
+    allLogs = LoadAllLogs(logList)
+    hits = SearchLogsForPhrase(searchPhrase, allLogs)
 
-            date = datetime.datetime.strptime(timeString, "%Y-%m-%d-%H:%M:%S.%f")
-            return date.timestamp() # convert to UNIX time
-        except:
-            return ''
+    print(f'Matches found: {len(hits)}')
+
+    for hit in hits:
+        print(f'time:{hit[0]} - message: {hit[1][0: messageLength]}')
