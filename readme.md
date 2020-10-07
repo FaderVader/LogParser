@@ -47,14 +47,14 @@ The target-app will respond to REST-queries, and return requested data. The log-
 **{ client { logfile [ timestamp, payload ] } }** \
 `clients = {"AX82017": {}, "AX82018": {}, "TX45046": {} }` # dict enforces uniqueness \
 `file = {'file1': [], 'file2': [], 'file3': []}`\
-`lines = [(10, '10-lines'), (20, '20-lines'), (30, '30-lines')]`  # (timestamp, payload)\
+`lines = [(10, '10-lines'), (20, '20-lines'), (30, '30-lines')]`  # (timestamp, payload) \
 
-**\# assignment**\
-`clients['AX82018'] = file`\
+**\# assignment** \
+`clients['AX82018'] = file` \
 `clients['AX82018']['file2'] = lines` \
 
 **\# retrieve** \
-`print(clients['AX82018']['file2']) `\
+`print(clients['AX82018']['file2']) ` \
 
 
 
