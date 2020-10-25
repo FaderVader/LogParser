@@ -8,6 +8,20 @@ def loadOneLogfile(path):
     return allLines
 
 
+def LoadLogsFromStructure(fileStructure):
+    base_path = './testSources/'  # if debug: './testSources/'   if run from shell: '../testSources/'
+    app_name = 'GalaxySiteSelector'
+    file_ext = '.log'
+
+    for client in fileStructure:
+        for logfile in fileStructure[client]:
+            complete_filename = f'{app_name}-{client}-{logfile}{file_ext}'
+            file_contents = loadOneLogfile(f'{base_path}{complete_filename}')
+            fileStructure[client][logfile] = file_contents 
+    return fileStructure
+
+
+# deprecated
 def LoadAllLogs(logList):
     logs = []
     basePath = './testSources/' # run = '../'    debug = './'
@@ -20,7 +34,7 @@ def LoadAllLogs(logList):
         logs.append(loadOneLogfile(basePath + logfile + extension))
     return logs
 
-
+# deprecated
 def SearchLogsForPhrase(searchPhrase, logs):
     hits = []
     for log in logs:
