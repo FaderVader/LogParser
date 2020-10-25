@@ -50,3 +50,9 @@ for client in dict_of_clients_of_files:
     print(client)
     for files in dict_of_clients_of_files[client]:
         print(' '*3, files)
+
+selected_client = dict_of_clients['AX82017']
+for filename in selected_client:
+    if '20200929' in filename:
+        print(filename)
+
