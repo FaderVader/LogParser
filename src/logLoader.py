@@ -19,26 +19,3 @@ def LoadLogsFromStructure(fileStructure):
             file_contents = loadOneLogfile(f'{base_path}{complete_filename}')
             fileStructure[client][logfile] = file_contents 
     return fileStructure
-
-
-# deprecated
-def LoadAllLogs(logList):
-    logs = []
-    basePath = './testSources/' # run = '../'    debug = './'
-    extension = '.log'
-
-    # load all logs
-    for logfile in logList:
-
-        # log-lines should eventually be stored by {clientname: {filename: [loglines ]}}
-        logs.append(loadOneLogfile(basePath + logfile + extension))
-    return logs
-
-# deprecated
-def SearchLogsForPhrase(searchPhrase, logs):
-    hits = []
-    for log in logs:
-        for logLine in log:
-            if logLine.GetPayLoad().find(searchPhrase) > -1:
-                hits.append((logLine.GetTimeStamp(), logLine.GetPayLoad())) # store as tuple
-    return hits
