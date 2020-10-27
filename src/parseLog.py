@@ -6,6 +6,10 @@ terminator is reference to {client, date, linenumber}
 Lines should be cleaned:
 lowercased
 """
+from collections import namedtuple
+
+# Test
+# Terminator = namedtuple("Terminator", "client date linenumber")
 
 class Node:
     def __init__(self, key=None, value=None):
