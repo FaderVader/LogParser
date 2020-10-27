@@ -8,7 +8,7 @@ def _stripFileNames(file_list):
     return stripped_file_names
 
 
-def getListOfFiles():
+def GetListOfFiles():
     base_path = './testSources/'
     files = listdir(base_path)
 

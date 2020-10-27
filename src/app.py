@@ -1,10 +1,10 @@
-from logLoader import LoadAllLogs, SearchLogsForPhrase, LoadLogsFromStructure
+from FileLoader import LoadLogsFromStructure
 from StructureBuilder import StructureBuilder
-from parseLog import LogTrie
-from findLogs import getListOfFiles
+from ParseLog import LogTrie
+from FindLogsInFolder import GetListOfFiles
 
 # get list of log-files
-logList = getListOfFiles()
+logList = GetListOfFiles()
 
 # build structured file-list, based on client-name and date
 fileStructure = StructureBuilder.CreateFileStructure(logList)
@@ -23,9 +23,7 @@ log_entry_1 = trie.findWord('Application')
 log_entry_2 = trie.findWord('[WRN]')
 
 for pointer in log_entry_1:
-    client = pointer[0]
-    date = pointer[1]
-    line = pointer[2]
+    client, date, line = pointer[0], pointer[1], pointer[2]
     actual_line = all_files[client][date][line]
     print(f'Client: {client} - date: {date} - line: {line}')
     print(actual_line.lineElements[1])
