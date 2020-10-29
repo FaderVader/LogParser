@@ -60,7 +60,7 @@ The target-app will respond to REST-queries, and return requested data. The log-
 
 ### Development agenda - Tech ###
 
-In order to get useful stats from the log-file collection, I expect to use various sorting and tree-search algorithms to generate the reports.
+In order to get useful stats from the log-file collection, I expect to use various sorting and tree-search algorithms to generate the reports. **Tries**, in particular should be helpful for indexing search-terms.
 
 
 
