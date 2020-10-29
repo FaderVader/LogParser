@@ -8,8 +8,7 @@ def loadOneLogfile(path):
     return allLines
 
 
-def LoadLogsFromStructure(fileStructure):
-    base_path = './testSources/'  # if debug: './testSources/'   if run from shell: '../testSources/'
+def LoadLogsFromStructure(fileStructure, base_path):
     app_name = 'GalaxySiteSelector'
     file_ext = '.log'
 

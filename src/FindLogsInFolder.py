@@ -1,3 +1,6 @@
+"This module finds all files in specified folder"
+"Extension is stripped from File-name"
+
 from os import listdir
 from os.path import join, isfile, isdir
 
@@ -8,9 +11,7 @@ def _stripFileNames(file_list):
     return stripped_file_names
 
 
-def GetListOfFiles():
-    base_path = './testSources/'
+def GetListOfFiles(base_path):
     files = listdir(base_path)
-
     stripped = _stripFileNames(files)
     return stripped

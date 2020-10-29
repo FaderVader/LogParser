@@ -8,8 +8,6 @@ lowercased
 """
 from collections import namedtuple
 
-
-
 class Node:
     def __init__(self, key=None, value=None):
         self.key = key
@@ -20,10 +18,11 @@ class LogTrie():
     def __init__(self):
         self.root = Node()
 
-    # Test
+    # struct
     Terminator = namedtuple("Terminator", "client date linenumber")
 
-    def addWord(self, word, terminator='terminator'):
+    # actual trie parser
+    def addWord(self, word, terminator):
         def inner(word, node):
             if len(word) == 0:
                 if node.value is None:
@@ -41,16 +40,19 @@ class LogTrie():
                 return inner(word[1:], node.children[word[0]])
         return inner(word, self.root)
     
-    def addLine(self, line, terminator='terminator'):
+    # format to words
+    def addLine(self, line, terminator):
         words = line.split()
         for word in words:
             self.addWord(word, terminator)
 
-    def addLog(self, logFile, terminator='terminator'):
+    # get file and split into lines
+    def addLog(self, logFile, terminator=Terminator('*', '*', '*')): 
         for linenumber, line in enumerate(logFile):
             text = line.GetPayLoad()
-            lineId = (terminator[0], terminator[1], linenumber)
+            lineId = self.Terminator(terminator.client, terminator.date, linenumber)
             self.addLine(text, lineId)
+
     
     def findWord(self, word):
         currentWord = word
