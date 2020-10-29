@@ -3,7 +3,7 @@ import time
 
 class LogLine():
     def __init__(self, logLine):
-        self.lineElements = self.getLogLineElements(logLine)
+        self.lineElements = self.readLineElements(logLine)
 
     def GetTimeStamp(self):
         return self.lineElements[0]
@@ -11,7 +11,7 @@ class LogLine():
     def GetPayLoad(self):
         return self.lineElements[1]
     
-    def getLogLineElements(self, logLine):
+    def readLineElements(self, logLine):
         elements = logLine.split()
         try:
             timeStamp = self.parseStringToTime(elements[0]) 

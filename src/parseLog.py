@@ -8,8 +8,7 @@ lowercased
 """
 from collections import namedtuple
 
-# Test
-# Terminator = namedtuple("Terminator", "client date linenumber")
+
 
 class Node:
     def __init__(self, key=None, value=None):
@@ -21,6 +20,9 @@ class LogTrie():
     def __init__(self):
         self.root = Node()
 
+    # Test
+    Terminator = namedtuple("Terminator", "client date linenumber")
+
     def addWord(self, word, terminator='terminator'):
         def inner(word, node):
             if len(word) == 0:
@@ -28,7 +30,7 @@ class LogTrie():
                     node.value = [terminator] 
                 else:
                     temp = node.value
-                    temp.append(terminator) #elements must be concatenated: multiple hits are expected 
+                    temp.append(terminator) #elements are concatenated: multiple hits are expected 
                     node.value = temp
                 return
             elif word[0] not in node.children:
@@ -46,7 +48,7 @@ class LogTrie():
 
     def addLog(self, logFile, terminator='terminator'):
         for linenumber, line in enumerate(logFile):
-            text = line.lineElements[1]
+            text = line.GetPayLoad()
             lineId = (terminator[0], terminator[1], linenumber)
             self.addLine(text, lineId)
     
