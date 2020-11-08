@@ -1,6 +1,8 @@
-# 1 - build list of unique client-names -> create dict, key: clientname
-# 2 - build list of unique log-files pr client -> create dict, key: filename
-# for every log-file, build list of lines, then set 2. dict value to list
+""" 
+    - build list of unique client-names -> create dict, key: clientname
+    - build list of unique log-files pr client -> create dict, key: filename
+    - for every log-file, build list of lines, then set 2. dict value to list
+"""
 
 class StructureBuilder:
 
@@ -31,9 +33,9 @@ class StructureBuilder:
 
         for client in clientDict:
             client_list = []
-            for file in filelist:
+            for file in filelist:  # refactor: we should pop item from list. File can only be added once
                 if client in file:
-                    client_list.append(StructureBuilder.file_name_stripper(file)) # we should pop item from list. File can only be added once
+                    client_list.append(StructureBuilder.file_name_stripper(file)) 
             clientDict[client] = dict.fromkeys(client_list, [])
         return clientDict
 

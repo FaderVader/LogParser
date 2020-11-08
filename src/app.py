@@ -20,7 +20,7 @@ trie = LogTrie()
 for client in fileStructure:
     for log in fileStructure[client]:
         log_file = all_files[client][log]
-        value = LogTrie.Terminator(client, log, '')
+        value = LogTrie.Terminator(client, log, None)
         trie.addLog(log_file, value)
 
 
