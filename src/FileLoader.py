@@ -1,3 +1,7 @@
+"""
+This module loads all log-files from designated folder
+"""
+
 from LogLine import LogLine
 
 def loadOneLogfile(path):

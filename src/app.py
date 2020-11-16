@@ -1,10 +1,11 @@
 from FileLoader import LoadLogsFromStructure
 from StructureBuilder import StructureBuilder
-from ParseLog import LogTrie
+from TrieBuilder import LogTrie
 from FindLogsInFolder import GetListOfFiles
+from Query import Query
 
 # config - if debug: './testSources/'   if run from shell: '../testSources/'
-base_path = '../testSources/' 
+base_path = './testSources/' 
 
 # get list of log-files
 logList = GetListOfFiles(base_path)
@@ -24,14 +25,13 @@ for client in fileStructure:
         trie.addLog(log_file, value)
 
 
-# POC - searching trie
-log_entry_1 = trie.findWord('Application')
-log_entry_2 = trie.findWord('[WRN]')
+query = Query(trie)
+result = query.mustContainWords('SendEvent', 'StartGalaxy', 'Success', 'DALG0')
 
-# POC - show hits
-for pointer in log_entry_2:
+# # POC - show hits
+for pointer in result:
     actual_line = all_files[pointer.client][pointer.date][pointer.linenumber]
     print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
-    print(actual_line.GetPayLoad())
+    print(actual_line.GetTimeStamp(), actual_line.GetPayLoad())
 
 print('done')

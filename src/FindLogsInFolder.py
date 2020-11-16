@@ -1,5 +1,7 @@
-"This module finds all files in specified folder"
-"Extension is stripped from File-name"
+"""
+This module finds all files in specified folder
+Extension is stripped from File-name
+"""
 
 from os import listdir
 from os.path import join, isfile, isdir
