@@ -1,12 +1,13 @@
 """
     Build generic methods for querying trie.
 """
-from TrieBuilder import SearchTrie
+from Tries import SearchTrie
 
 class Query:
     def __init__(self, log_trie):
         self.log_trie = log_trie
         self.search_trie = SearchTrie()
+        self.result = None
 
     def mustContainWords(self, *args):
         for arg in args:            
@@ -27,7 +28,9 @@ class Query:
             hits = self.search_trie.findPointer(pointer)
             if hits >= len(args):
                 hit_list.append(pointer)
-        return hit_list
+
+        self.result = hit_list    
+        # return hit_list
 
     def mustBeBetween(self, start_date, end_date):
         pass
@@ -38,5 +41,12 @@ class Query:
     def mustBeAfter(self, date):
         pass
 
-    def mustByFromClient(self, client_name):
+    def mustBeFromClient(self, client_name):
         pass
+
+    def ShowResults(self, all_files):
+        for pointer in self.result:
+            actual_line = all_files[pointer.client][pointer.date][pointer.linenumber]
+            print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
+            print(actual_line.GetTimeStamp(), actual_line.GetPayLoad())
+
