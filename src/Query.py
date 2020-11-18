@@ -11,6 +11,7 @@ class Query:
         self.all_files = all_files
         self.results = None
 
+    # 'private' method
     def _buildSearchTrie(self, *args):
         for arg in args:            
             # get pointer to matches for every word
@@ -20,6 +21,7 @@ class Query:
             # build trie of pointers, terminator indicates number of hits
             for match in matches:
                 self.search_trie.addPointer(match)
+
 
     def mustContainWords(self, *args):
         self._buildSearchTrie(*args)
@@ -36,9 +38,11 @@ class Query:
                 hit_list.append(pointer)
         self.results = hit_list    
 
+
     def mustBeBetween(self, start_date, end_date): # date format: 2020-09-04-18:16:12.1515421
         self.mustBeAfter(start_date)
         self.mustBeFore(end_date)
+
 
     def mustBeFore(self, date):
         end_date_epoch = LogLine.parseStringToTime(date)
@@ -51,6 +55,7 @@ class Query:
                 local_results.append(pointer)
         self.results = local_results
 
+
     def mustBeAfter(self, date):
         start_date_epoch = LogLine.parseStringToTime(date)
         local_results = []
@@ -62,10 +67,17 @@ class Query:
                 local_results.append(pointer)
         self.results = local_results
 
-    def mustBeFromClient(self, client_name):
-        pass
 
-    def ShowResults(self):
+    def mustBeFromClient(self, client_name):
+        local_results = []
+
+        for pointer in self.results:
+            if pointer.client == client_name:
+                local_results.append(pointer)
+        self.results = local_results
+
+
+    def showResults(self):
         for pointer in self.results:
             actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
             print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')

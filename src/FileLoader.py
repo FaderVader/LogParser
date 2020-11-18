@@ -12,7 +12,8 @@ def loadOneLogfile(path):
     return allLines
 
 
-def LoadLogsFromStructure(fileStructure, base_path):
+# arg fileStructure should be instance of output from StructureBuilder
+def LoadLogsFromStructure(fileStructure, base_path): 
     app_name = 'GalaxySiteSelector'
     file_ext = '.log'
 
