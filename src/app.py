@@ -15,7 +15,10 @@ logs = trie.GetStructuredLogs()
 query = Query(loaded_trie, logs)
 
 # perform query
-query.mustContainWords('SendEvent', 'StartGalaxy', 'Success', 'DALG0')
+query.mustContainWords('SendEvent', 'StartGalaxy', 'Success', 'DALG2')
+# query.mustBeAfter('2020-10-05-14:05:17.0')
+# query.mustBeFore('2020-10-05-14:05:17.0')
+query.mustBeBetween('2020-10-05-14:05:17.0', '2020-10-09-12:48:09.0')
 query.ShowResults()
 
 print('done')

@@ -2,13 +2,14 @@
     Build generic methods for querying trie.
 """
 from Tries import SearchTrie
+from LogLine import LogLine 
 
 class Query:
     def __init__(self, log_trie, all_files):
         self.log_trie = log_trie
         self.search_trie = SearchTrie()
         self.all_files = all_files
-        self.result = None
+        self.results = None
 
     def _buildSearchTrie(self, *args):
         for arg in args:            
@@ -27,29 +28,46 @@ class Query:
         searchTerm = args[0].lower()
         log_pointers = self.log_trie.findWord(searchTerm)
 
+        # to satisfy criteria, a hit must contain at least all search-terms
         hit_list = []
         for pointer in log_pointers:
             hits = self.search_trie.findPointer(pointer)
             if hits >= len(args):
                 hit_list.append(pointer)
+        self.results = hit_list    
 
-        self.result = hit_list    
-
-    def mustBeBetween(self, start_date, end_date):
-        pass
+    def mustBeBetween(self, start_date, end_date): # date format: 2020-09-04-18:16:12.1515421
+        self.mustBeAfter(start_date)
+        self.mustBeFore(end_date)
 
     def mustBeFore(self, date):
-        pass
+        end_date_epoch = LogLine.parseStringToTime(date)
+        local_results = []
+
+        for pointer in self.results:
+            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
+            time_stamp = actual_line.GetTimeStamp()
+            if (time_stamp <= end_date_epoch):
+                local_results.append(pointer)
+        self.results = local_results
 
     def mustBeAfter(self, date):
-        pass
+        start_date_epoch = LogLine.parseStringToTime(date)
+        local_results = []
+
+        for pointer in self.results:
+            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
+            time_stamp = actual_line.GetTimeStamp()
+            if (time_stamp >= start_date_epoch):
+                local_results.append(pointer)
+        self.results = local_results
 
     def mustBeFromClient(self, client_name):
         pass
 
     def ShowResults(self):
-        for pointer in self.result:
+        for pointer in self.results:
             actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
             print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
-            print(actual_line.GetTimeStamp(), actual_line.GetPayLoad())
+            print(LogLine.parseTimeStampToString(actual_line.GetTimeStamp()), actual_line.GetPayLoad())
 
