@@ -4,12 +4,13 @@
 from Tries import SearchTrie
 
 class Query:
-    def __init__(self, log_trie):
+    def __init__(self, log_trie, all_files):
         self.log_trie = log_trie
         self.search_trie = SearchTrie()
+        self.all_files = all_files
         self.result = None
 
-    def mustContainWords(self, *args):
+    def _buildSearchTrie(self, *args):
         for arg in args:            
             # get pointer to matches for every word
             word = arg.lower()
@@ -18,6 +19,9 @@ class Query:
             # build trie of pointers, terminator indicates number of hits
             for match in matches:
                 self.search_trie.addPointer(match)
+
+    def mustContainWords(self, *args):
+        self._buildSearchTrie(*args)
     
         # any complete match must include one of the searchterms - we pick the first
         searchTerm = args[0].lower()
@@ -30,7 +34,6 @@ class Query:
                 hit_list.append(pointer)
 
         self.result = hit_list    
-        # return hit_list
 
     def mustBeBetween(self, start_date, end_date):
         pass
@@ -44,9 +47,9 @@ class Query:
     def mustBeFromClient(self, client_name):
         pass
 
-    def ShowResults(self, all_files):
+    def ShowResults(self):
         for pointer in self.result:
-            actual_line = all_files[pointer.client][pointer.date][pointer.linenumber]
+            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
             print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
             print(actual_line.GetTimeStamp(), actual_line.GetPayLoad())
 

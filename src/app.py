@@ -2,15 +2,20 @@ from Query import Query
 from PrepareTrie import PrepareTrie
 
 
-"""
-This is bad structure - with a 3rd-party reference shared between two classes
-Refactor for higher cohesion!
-"""
+# Setup the tries
 trie = PrepareTrie()
-loaded = trie.LoadLogs()
+
+# load logs  
+loaded_trie = trie.GetLogTrie()
+
+# get the files in structured format
 logs = trie.GetStructuredLogs()
-query = Query(loaded)
+
+# setup the query
+query = Query(loaded_trie, logs)
+
+# perform query
 query.mustContainWords('SendEvent', 'StartGalaxy', 'Success', 'DALG0')
-query.ShowResults(logs)
+query.ShowResults()
 
 print('done')
