@@ -2,7 +2,8 @@
     Build generic methods for querying trie.
 """
 from Tries import SearchTrie
-from LogLine import LogLine 
+from LogLine import LogLine
+from BinarySearchTree import BST
 
 class Query:
     def __init__(self, log_trie, all_files):
@@ -77,9 +78,27 @@ class Query:
         self.results = local_results
 
 
-    def showResults(self):
+    def sortOnTime(self):
+        bst = BST()
+
+        for pointer in self.results:
+            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
+            bst.add(f'{actual_line.GetTimeStamp()} {actual_line.GetPayLoad()}')
+
+        sorted = bst.inOrder()
+        for line in sorted:
+            print(line)
+
+        
+
+    def showResults(self, format=0):
         for pointer in self.results:
             actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
             print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
-            print(LogLine.parseTimeStampToString(actual_line.GetTimeStamp()), actual_line.GetPayLoad())
+            if format != 0:
+                time = LogLine.parseTimeStampToString(actual_line.GetTimeStamp())
+            else:
+                time = actual_line.GetTimeStamp()
+
+            print(time, actual_line.GetPayLoad())
 
