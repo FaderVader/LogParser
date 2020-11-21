@@ -87,8 +87,9 @@ class Query:
 
         sorted = bst.inOrder()
         for line in sorted:
-            print(line)
-
+            segments = line.split()
+            time = segments[0]
+            print(f'{LogLine.parseTimeStampToString(float(time))}')
         
 
     def showResults(self, format=0):
