@@ -3,7 +3,7 @@ This class represents a single line from a log-file
 """
 
 from datetime import datetime
-import time
+
 
 class LogLine():
     def __init__(self, logLine):
@@ -14,15 +14,15 @@ class LogLine():
 
     def GetPayLoad(self):
         return self.lineElements[1]
-    
+
     def readLineElements(self, logLine):
         elements = logLine.split()
         try:
             timeStamp = self.parseStringToTime(elements[0]) 
-        except IndexError:  
+        except IndexError:
             timeStamp = ''
 
-        try: 
+        try:
             startIndex = logLine.find('[', 0)
             payload = logLine[startIndex:]
         except IndexError:
@@ -45,6 +45,7 @@ class LogLine():
     def parseTimeStampToString(timestamp):
         time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d-%H:%M:%S.%f') # convert from UNIX time
         return time
+
 
 if __name__ == "__main__":
     epoch = LogLine.parseStringToTime('2020-10-01T09:12:02.7398274+02:00')

@@ -1,5 +1,6 @@
 from ..LogLine import LogLine
 
+
 def test_LogLine_Should_Convert_TrueDate_To_TimeStamp():
     # Arrange
     date_as_string = '2020-09-29T08:42:42.034629+02:00'
@@ -22,4 +23,3 @@ def test_LogLine_Should_Convert_Timestamp_To_TrueDate():
 
     # Assert
     assert date_as_string == expected_result
-

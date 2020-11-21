@@ -1,9 +1,10 @@
 """
     Build generic methods for querying trie.
 """
-from Tries import SearchTrie
+from Tries import SearchTrie, LogTrie, LogTrieSorted
 from LogLine import LogLine
 from BinarySearchTree import BST
+
 
 class Query:
     def __init__(self, log_trie, all_files):
@@ -12,7 +13,10 @@ class Query:
         self.all_files = all_files
         self.results = None
 
-    # 'private' method
+    # 'private' methods
+    def getLine(self, pointer):
+        return self.all_files[pointer.client][pointer.date][pointer.linenumber]
+
     def _buildSearchTrie(self, *args):
         for arg in args:            
             # get pointer to matches for every word
@@ -23,10 +27,9 @@ class Query:
             for match in matches:
                 self.search_trie.addPointer(match)
 
-
     def mustContainWords(self, *args):
         self._buildSearchTrie(*args)
-    
+
         # any complete match must include one of the searchterms - we pick the first
         searchTerm = args[0].lower()
         log_pointers = self.log_trie.findWord(searchTerm)
@@ -37,37 +40,33 @@ class Query:
             hits = self.search_trie.findPointer(pointer)
             if hits >= len(args):
                 hit_list.append(pointer)
-        self.results = hit_list    
+        self.results = hit_list
 
-
-    def mustBeBetween(self, start_date, end_date): # date format: 2020-09-04-18:16:12.1515421
+    def mustBeBetween(self, start_date, end_date):  # date format: 2020-09-04-18:16:12.1515421
         self.mustBeAfter(start_date)
         self.mustBeFore(end_date)
-
 
     def mustBeFore(self, date):
         end_date_epoch = LogLine.parseStringToTime(date)
         local_results = []
 
         for pointer in self.results:
-            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
+            actual_line = self.getLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
             if (time_stamp <= end_date_epoch):
                 local_results.append(pointer)
         self.results = local_results
-
 
     def mustBeAfter(self, date):
         start_date_epoch = LogLine.parseStringToTime(date)
         local_results = []
 
         for pointer in self.results:
-            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
+            actual_line = self.getLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
             if (time_stamp >= start_date_epoch):
                 local_results.append(pointer)
         self.results = local_results
-
 
     def mustBeFromClient(self, client_name):
         local_results = []
@@ -77,24 +76,26 @@ class Query:
                 local_results.append(pointer)
         self.results = local_results
 
-
     def sortOnTime(self):
         bst = BST()
+        logTrieSorted = LogTrieSorted()  # Sorted
 
         for pointer in self.results:
-            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
+            actual_line = self.getLine(pointer)
             bst.add(f'{actual_line.GetTimeStamp()} {actual_line.GetPayLoad()}')
+            logTrieSorted.addLine(f'{actual_line.GetTimeStamp()} {actual_line.GetPayLoad()}', pointer)
 
         sorted = bst.inOrder()
         for line in sorted:
             segments = line.split()
             time = segments[0]
-            print(f'{LogLine.parseTimeStampToString(float(time))}')
-        
+            test = logTrieSorted.findWord(time)[0]
+            actual_line = self.getLine(test)
+            print(f'{LogLine.parseTimeStampToString(actual_line.GetTimeStamp())} {actual_line.GetPayLoad()}')
 
     def showResults(self, format=0):
         for pointer in self.results:
-            actual_line = self.all_files[pointer.client][pointer.date][pointer.linenumber]
+            actual_line = self.getLine(pointer)
             print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
             if format != 0:
                 time = LogLine.parseTimeStampToString(actual_line.GetTimeStamp())
@@ -102,4 +103,3 @@ class Query:
                 time = actual_line.GetTimeStamp()
 
             print(time, actual_line.GetPayLoad())
-

@@ -1,8 +1,9 @@
 class Node:
-    def __init__(self, data, left = None, right = None):
+    def __init__(self, data, left=None, right=None):
         self.data = data
         self.left = left
         self.right = right
+
 
 class BST:
     def __init__(self):
@@ -14,13 +15,13 @@ class BST:
             if data < node.data:
                 if node.left is None:
                     node.left = Node(data)
-                elif node.left != None:
+                elif node.left is not None:
                     return searchTree(data, node.left)
             elif data > node.data:
                 if node.right is None:
                     node.right = Node(data)
                     return
-                elif node.right != None:
+                elif node.right is not None:
                     return searchTree(data, node.right)
             else:
                 return None
@@ -29,30 +30,29 @@ class BST:
         if node is None:
             self.root = Node(data)
             return
-        else: 
+        else:
             return searchTree(data, node)
-
 
     def remove(self, value):
         def removeNode(node, value):
             if node is None: return None
-            
+
             if value == node.data:
-                if node.left is None and node.right is None: # node has no children 
+                if node.left is None and node.right is None:  # node has no children
                     return None
-                
-                # node has no left child 
-                if node.left is None: 
+
+                # node has no left child
+                if node.left is None:
                     return node.right
 
-                # node has no right child 
-                if node.right is None: 
+                # node has no right child
+                if node.right is None:
                     return node.left
 
-                # node has two children 
+                # node has two children
                 tempNode = node.right
-                while tempNode.left != None:
-                    tempNode = tempNode.left                    
+                while tempNode.left is not None:
+                    tempNode = tempNode.left
                 node.data = tempNode.data
                 node.right = removeNode(node.right, tempNode.data)
                 return node
@@ -70,15 +70,14 @@ class BST:
     # tree introspection
     def isPresent(self, value):
         current = self.root
-        while current != None:
+        while current is not None:
             if current.data == value:
                 return True
             if current.data < value:
                 current = current.right
-            else: 
+            else:
                 current = current.left
         return False
-
 
     def isPresent_recursive(self, value):
         def inner(node):
@@ -90,43 +89,39 @@ class BST:
                 return inner(node.right)
             else:
                 return False
-        
-        return inner(self.root)
 
+        return inner(self.root)
 
     def findMin(self):
         current = self.root
-        while current.left != None:
+        while current.left is not None:
             current = current.left
         return current.data
 
-
     def findMax(self):
         current = self.root
-        while current.right != None:
+        while current.right is not None:
             current = current.right
         return current.data
 
-
-    def minHeight(self, node = None):
+    def minHeight(self, node=None):
         if node is None:
             node = self.root
 
-        def findMinHeight(node): 
-            if node == None:
+        def findMinHeight(node):
+            if node is None:
                 return -1
-            
+
             left = findMinHeight(node.left)
             right = findMinHeight(node.right)
 
             if left < right:
                 return left + 1
-            else: 
+            else:
                 return right + 1
         return findMinHeight(node)
 
-
-    def maxHeight(self, node = None):
+    def maxHeight(self, node=None):
         if node is None:
             node = self.root
 
@@ -141,18 +136,17 @@ class BST:
                 return left + 1
             else:
                 return right + 1
-        
+
         return findMaxHeight(node)
 
-
     def isBalanced(self):
-        return self.minHeight() >= self.maxHeight()-1
-    
+        return self.minHeight() >= self.maxHeight() - 1
+
     # get tree-content
     def inOrder(self):
         if self.root is None: return None
-
         result = []
+
         def traverseInOrder(node):
             if node.left is not None: traverseInOrder(node.left)
             result.append(node.data)
@@ -162,8 +156,8 @@ class BST:
 
     def preOrder(self):
         if self.root is None: return None
-
         result = []
+
         def traversePreOrder(node):
             result.append(node.data)
             if node.left is not None: traversePreOrder(node.left)
@@ -173,8 +167,8 @@ class BST:
 
     def postOrder(self):
         if self.root is None: return None
-
         result = []
+
         def traversePostOrder(node):
             if node.left is not None: traversePostOrder(node.left)
             if node.right is not None: traversePostOrder(node.right)
@@ -196,8 +190,7 @@ class BST:
                     Q.append(node.left)
                 if node.right is not None:
                     Q.append(node.right)
-            
+
             return result
-        else: 
+        else:
             return None
-        
