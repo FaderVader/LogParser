@@ -18,7 +18,9 @@ class Query:
         return self.all_files[pointer.client][pointer.date][pointer.linenumber]
 
     def _buildSearchTrie(self, *args):
-        for arg in args:            
+        args_as_list = [*args]
+
+        for arg in args_as_list:            
             # get pointer to matches for every word
             word = arg.lower()
             matches = self.log_trie.findWord(word) 

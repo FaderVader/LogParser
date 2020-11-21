@@ -3,11 +3,13 @@ import inspect
 
 
 class QueryParser:
-    def __init__(self):
+    def __init__(self, query):
         self.query_methods = ['find', 'between', 'client']
+        self.main_query = query
 
     def parse(self, args):
-        return self.get_members(args)
+        self.get_members(args)
+        self.main_query.showResults(1)
 
     def parse_json(self, query):
         data = json.loads(query)
@@ -26,23 +28,21 @@ class QueryParser:
 
     def find(self, args):
         query = self.parse_json(args)
-        result = query['find']
-        print(result)
+        result = [*query['find']]
+        self.main_query.mustContainWords(*result)
 
     def between(self, args):
         query = self.parse_json(args)
-        result = query['between']
-        print(result)
+        result = [*query['between']]
+        self.main_query.mustBeBetween(*result)
 
     def client(self, args):
         query = self.parse_json(args)
         result = query['client']
-        print(result)
+        self.main_query.mustBeFromClient(result)
 
 
 
-qp = QueryParser()
-query = '{"find": ["setupsession", "running"], "between": ["2020-10-06-0:0:0.0", "2020-10-06-23:59:59.9"], "client": "AX82017"}'
-# query = '{"find": ["setupsession", "running"]}'
-
-qp.parse(query)
+# qp = QueryParser()
+# query = '{"find": ["setupsession", "running"], "between": ["2020-10-06-0:0:0.0", "2020-10-06-23:59:59.9"], "client": "AX82017"}'
+# qp.parse(query)
