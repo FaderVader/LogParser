@@ -17,10 +17,13 @@ class Node:
 
 
 class LogTrie:
+    """
+    Main container for content of all log-files
+    """
     def __init__(self):
         self.root = Node()
 
-    # struct
+    # pointer to occurence of node in source-file
     Terminator = namedtuple("Terminator", "client date linenumber")
 
     # actual trie builder
@@ -30,16 +33,16 @@ class LogTrie:
                 if node.value is None:
                     node.value = [terminator] 
                 else:
-                    node.value.append(terminator) #elements are concatenated: multiple hits are expected 
+                    node.value.append(terminator)  # elements are concatenated: multiple hits are expected
                 return
             elif word[0] not in node.children:
                 newNode = Node(word[0])
                 node.children[word[0]] = newNode
                 return inner(word[1:], newNode)
-            else: 
+            else:
                 return inner(word[1:], node.children[word[0]])
         return inner(word, self.root)
-    
+
     # format to words
     def addLine(self, line, terminator):
         pattern = r'[()\[\]"\.:]'
@@ -50,7 +53,7 @@ class LogTrie:
             self.addWord(word, terminator)
 
     # get file and split into lines
-    def addLog(self, logFile, terminator=Terminator('*', '*', '*')): 
+    def addLog(self, logFile, terminator=Terminator('*', '*', '*')):
         for linenumber, line in enumerate(logFile):
             text = line.GetPayLoad()
             lineId = self.Terminator(terminator.client, terminator.date, linenumber)
@@ -93,7 +96,7 @@ class LogTrieSorted:
         return inner(word, self.root)
 
     def addLine(self, line, terminator):
-        pattern = r'[()\[\]":]'
+        pattern = r'[()\[\]":]'  # do not include . - we need it to parse time-stamps correctly
         cleaned_line = re.sub(pattern, ' ', line.lower())
 
         words = cleaned_line.split()
@@ -113,14 +116,16 @@ class LogTrieSorted:
 
 
 class SearchTrie:
+    """
+    Container for all pointers - is used for counting occurrences of search-phrase within a pointer
+    We need this for identifying multi-word hits on a line
+    """
     def __init__(self):
         self.root = Node()
-        self._sep = '.' # pointer elements delimimiter
-
+        self._sep = '.'  # pointer elements delimimiter
 
     def pointer_as_string(self, pointer):
         return f'{pointer.client}{self._sep}{pointer.date}{self._sep}{pointer.linenumber}'
-    
 
     def addPointer(self, pointer):
         pointer_as_string = self.pointer_as_string(pointer)
@@ -128,19 +133,18 @@ class SearchTrie:
         def inner(pointer, node):
             if len(pointer) == 0:
                 if node.value is None:
-                    node.value = 1 # occured once 
+                    node.value = 1  # occured once
                 else:
-                    node.value = node.value + 1 # inc up on every hit 
+                    node.value = node.value + 1  # inc up on every hit
                 return
             elif pointer[0] not in node.children:
                 newNode = Node(pointer[0])
                 node.children[pointer[0]] = newNode
                 return inner(pointer[1:], newNode)
-            else: 
+            else:
                 return inner(pointer[1:], node.children[pointer[0]])
         return inner(pointer_as_string, self.root)
-    
-    
+
     def findPointer(self, pointer):
         currentPointer = self.pointer_as_string(pointer)
         currentNode = self.root

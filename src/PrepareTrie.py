@@ -12,8 +12,10 @@ class PrepareTrie:
         self.all_files = LoadLogsFromStructure(self.fileStructure, self.base_path)
         self.log_trie = None
 
-    def _loadLogs(self):
-        # transform all log-files in trie-structure
+    def loadLogs(self):
+        """
+        Transform all log-files into trie-structure
+        """
         trie = LogTrie()
         for client in self.fileStructure:
             for log in self.fileStructure[client]:
@@ -23,9 +25,15 @@ class PrepareTrie:
         self.log_trie = trie
 
     def GetLogTrie(self):
+        """
+        Get all logs as trie
+        """
         if self.log_trie is None:
-            self._loadLogs()
+            self.loadLogs()
         return self.log_trie
 
     def GetStructuredLogs(self):
+        """
+        Get all logs as structured object: [client][file][linenumber]
+        """
         return self.all_files

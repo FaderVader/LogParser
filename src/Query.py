@@ -1,12 +1,12 @@
-"""
-    Build generic methods for querying trie.
-"""
 from Tries import SearchTrie, LogTrie, LogTrieSorted
 from LogLine import LogLine
 from BinarySearchTree import BST
 
 
 class Query:
+    """
+    Low-level, generic methods for querying trie.
+    """
     def __init__(self, log_trie, all_files):
         self.log_trie = log_trie
         self.search_trie = SearchTrie()
@@ -24,7 +24,7 @@ class Query:
             # get pointer to matches for every word
             word = arg.lower()
             matches = self.log_trie.findWord(word) 
-            
+  
             # build trie of pointers, terminator indicates number of hits
             for match in matches:
                 self.search_trie.addPointer(match)
