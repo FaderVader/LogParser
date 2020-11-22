@@ -52,14 +52,20 @@ class LogTrie:
         for word in words:
             self.addWord(word, terminator)
 
-    # get file and split into lines
-    def addLog(self, logFile, terminator=Terminator('*', '*', '*')):
+    def AddLog(self, logFile, terminator=Terminator('*', '*', '*')):
+        """
+        Takes a log-file as argument and split into lines.
+        The terminator-items should be [client][filedate]
+        """
         for linenumber, line in enumerate(logFile):
             text = line.GetPayLoad()
             lineId = self.Terminator(terminator.client, terminator.date, linenumber)
             self.addLine(text, lineId)
 
-    def findWord(self, word):
+    def FindWord(self, word):
+        """
+        Return all matches for search-word as pointers.
+        """
         currentWord = word
         currentNode = self.root
         while len(currentWord) > 0:
@@ -117,7 +123,7 @@ class LogTrieSorted:
 
 class SearchTrie:
     """
-    Container for all pointers - is used for counting occurrences of search-phrase within a pointer
+    Container for all pointers - is used for counting occurrences of search-phrase within a pointer.
     We need this for identifying multi-word hits on a line
     """
     def __init__(self):

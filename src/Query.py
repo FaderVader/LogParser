@@ -1,4 +1,4 @@
-from Tries import SearchTrie, LogTrie, LogTrieSorted
+from Tries import SearchTrie, LogTrieSorted
 from LogLine import LogLine
 from BinarySearchTree import BST
 
@@ -13,28 +13,34 @@ class Query:
         self.all_files = all_files
         self.results = None
 
-    # 'private' methods
     def getLine(self, pointer):
         return self.all_files[pointer.client][pointer.date][pointer.linenumber]
 
-    def _buildSearchTrie(self, *args):
+    def buildSearchTrie(self, *args):
+        """
+        Build list of matches from search-words. 
+        Put returned pointers into sub-trie.
+        """
         args_as_list = [*args]
 
         for arg in args_as_list:            
             # get pointer to matches for every word
             word = arg.lower()
-            matches = self.log_trie.findWord(word) 
-  
+            matches = self.log_trie.FindWord(word) 
+
             # build trie of pointers, terminator indicates number of hits
             for match in matches:
                 self.search_trie.addPointer(match)
 
-    def mustContainWords(self, *args):
-        self._buildSearchTrie(*args)
+    def MustContainWords(self, *args):
+        """
+        Set Query.results to contain all matches
+        """
+        self.buildSearchTrie(*args)
 
         # any complete match must include one of the searchterms - we pick the first
         searchTerm = args[0].lower()
-        log_pointers = self.log_trie.findWord(searchTerm)
+        log_pointers = self.log_trie.FindWord(searchTerm)
 
         # to satisfy criteria, a hit must contain at least all search-terms
         hit_list = []
@@ -44,11 +50,17 @@ class Query:
                 hit_list.append(pointer)
         self.results = hit_list
 
-    def mustBeBetween(self, start_date, end_date):  # date format: 2020-09-04-18:16:12.1515421
-        self.mustBeAfter(start_date)
-        self.mustBeFore(end_date)
+    def MustBetween(self, start_date, end_date):  # date format: 2020-09-04-18:16:12.1515421
+        """
+        Truncate Query.results to a time-span
+        """
+        self.MustBeAfter(start_date)
+        self.MustBeFore(end_date)
 
-    def mustBeFore(self, date):
+    def MustBeFore(self, date):
+        """
+        Truncate Query.results to only events before 
+        """
         end_date_epoch = LogLine.parseStringToTime(date)
         local_results = []
 
@@ -59,7 +71,10 @@ class Query:
                 local_results.append(pointer)
         self.results = local_results
 
-    def mustBeAfter(self, date):
+    def MustBeAfter(self, date):
+        """
+        Truncate Query.results to only events after
+        """
         start_date_epoch = LogLine.parseStringToTime(date)
         local_results = []
 
@@ -70,7 +85,10 @@ class Query:
                 local_results.append(pointer)
         self.results = local_results
 
-    def mustBeFromClient(self, client_name):
+    def MustBeFromClient(self, client_name):
+        """
+        Truncate Query.results to only be from specified client
+        """
         local_results = []
 
         for pointer in self.results:
@@ -78,7 +96,11 @@ class Query:
                 local_results.append(pointer)
         self.results = local_results
 
-    def sortOnTime(self):
+    def SortOnTime(self):
+        """
+        For every Query.results, create line incl timestamp.
+        Add complete line to BST and new sorted trie.
+        """
         bst = BST()
         logTrieSorted = LogTrieSorted()  # Sorted
 
@@ -95,7 +117,11 @@ class Query:
             actual_line = self.getLine(test)
             print(f'{LogLine.parseTimeStampToString(actual_line.GetTimeStamp())} {actual_line.GetPayLoad()}')
 
-    def showResults(self, format=0):
+    def ShowResults(self, format=0):
+        """
+        Print the content of Query.results.
+        Add argument 'format=1' to print time in true date, otherwise epoch.
+        """
         for pointer in self.results:
             actual_line = self.getLine(pointer)
             print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')

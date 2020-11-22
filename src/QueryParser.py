@@ -5,30 +5,28 @@ import inspect
 
 
 class QueryParser:
+    """
+    Frontend for queries. Instantiating invokes primary trie-building.
+    """
     def __init__(self):
-        self.query_methods = ['find', 'between', 'client']
+        self.query_methods = ['Find', 'Between', 'Client']
         self.base_query = None    # base query instance - should be reset before every parse-op
         self.loaded_trie = None   # Main trie - contains content of all logs
         self.logs = None          # all log-files in structured object
         self.setup()
 
     def setup(self):
-        trie = PrepareTrie()  # setup the tries
+        trie = PrepareTrie()                  # setup the tries
         self.loaded_trie = trie.GetLogTrie()  # load log-trie
         self.logs = trie.GetStructuredLogs()  # get the files in structured format
-
-    def getQuery(self):
-        query = Query(self.loaded_trie, self.logs)
-        return query
-
-    def parse(self, args):
-        self.base_query = self.getQuery()
-        self.invoke_query(args)
-        self.base_query.showResults(1)
 
     def parse_json(self, query):
         data = json.loads(query)
         return data
+
+    def get_query(self):
+        query = Query(self.loaded_trie, self.logs)
+        return query
 
     def invoke_query(self, args):
         user_query = self.parse_json(args)
@@ -41,18 +39,27 @@ class QueryParser:
                         method = getattr(QueryParser, function_name)
                         method(self, args)
 
-    # DSL
-    def find(self, args):
-        query = self.parse_json(args)
-        result = [*query['find']]
-        self.base_query.mustContainWords(*result)
+    def Parse(self, args):
+        """
+        Process the search-args.
+        Supported syntax: {"Find": [list of words], "Between": [startdate, enddate], "Client": clientname}
+        """
+        self.base_query = self.get_query()
+        self.invoke_query(args)
+        self.base_query.ShowResults(1)
 
-    def between(self, args):
+    # eDSL key-words
+    def Find(self, args):
         query = self.parse_json(args)
-        result = [*query['between']]
-        self.base_query.mustBeBetween(*result)
+        result = [*query['Find']]
+        self.base_query.MustContainWords(*result)
 
-    def client(self, args):
+    def Between(self, args):
         query = self.parse_json(args)
-        result = query['client']
-        self.base_query.mustBeFromClient(result)
+        result = [*query['Between']]
+        self.base_query.MustBetween(*result)
+
+    def Client(self, args):
+        query = self.parse_json(args)
+        result = query['Client']
+        self.base_query.MustBeFromClient(result)

@@ -21,12 +21,12 @@ class PrepareTrie:
             for log in self.fileStructure[client]:
                 log_file = self.all_files[client][log]
                 value = LogTrie.Terminator(client, log, None)
-                trie.addLog(log_file, value)
+                trie.AddLog(log_file, value)
         self.log_trie = trie
 
     def GetLogTrie(self):
         """
-        Get all logs as trie
+        Get trie from all logs
         """
         if self.log_trie is None:
             self.loadLogs()
