@@ -1,4 +1,4 @@
-from Tries import SearchTrie, LogTrieSorted
+from Tries import SearchTrie, LogTrie
 from LogLine import LogLine
 from BinarySearchTree import BST
 
@@ -102,20 +102,19 @@ class Query:
         Add complete line to BST and new sorted trie.
         """
         bst = BST()
-        logTrieSorted = LogTrieSorted()  # Sorted
 
         for pointer in self.results:
+            # print(pointer) #  Terminator(client='TX82564', date='20201006', linenumber=279)
             actual_line = self.getLine(pointer)
-            bst.add(f'{actual_line.GetTimeStamp()} {actual_line.GetPayLoad()}')
-            logTrieSorted.addLine(f'{actual_line.GetTimeStamp()} {actual_line.GetPayLoad()}', pointer)
+            bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}')  # add pointer-as-string instead?
 
         sorted = bst.inOrder()
+        sorted_list = []
         for line in sorted:
-            segments = line.split()
-            time = segments[0]
-            test = logTrieSorted.findWord(time)[0]
-            actual_line = self.getLine(test)
-            print(f'{LogLine.parseTimeStampToString(actual_line.GetTimeStamp())} {actual_line.GetPayLoad()}')
+            pointer_parts = line.split('##')[1].split('#') 
+            term = LogTrie.Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]))
+            sorted_list.append(term)
+        return sorted_list
 
     def ShowResults(self, format=0):
         """

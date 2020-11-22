@@ -9,7 +9,7 @@ class QueryParser:
     Frontend for queries. Instantiating invokes primary trie-building.
     """
     def __init__(self):
-        self.query_methods = ['Find', 'Between', 'Client']
+        self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']
         self.base_query = None    # base query instance - should be reset before every parse-op
         self.loaded_trie = None   # Main trie - contains content of all logs
         self.logs = None          # all log-files in structured object
@@ -25,6 +25,9 @@ class QueryParser:
         return data
 
     def get_query(self):
+        """
+        Used for resetting query and current result-list
+        """
         query = Query(self.loaded_trie, self.logs)
         return query
 
@@ -48,18 +51,43 @@ class QueryParser:
         self.invoke_query(args)
         self.base_query.ShowResults(1)
 
-    # eDSL key-words
+    # eDSL key-words 
     def Find(self, args):
         query = self.parse_json(args)
-        result = [*query['Find']]
-        self.base_query.MustContainWords(*result)
+        arguments = [*query['Find']]
+        self.base_query.MustContainWords(*arguments)
 
     def Between(self, args):
         query = self.parse_json(args)
-        result = [*query['Between']]
-        self.base_query.MustBetween(*result)
+        arguments = [*query['Between']]
+        self.base_query.MustBetween(*arguments)
 
     def Client(self, args):
         query = self.parse_json(args)
-        result = query['Client']
-        self.base_query.MustBeFromClient(result)
+        arguments = query['Client']
+        self.base_query.MustBeFromClient(arguments)
+
+    def Sort(self, args):
+        sorted_list = self.base_query.SortOnTime()
+        self.base_query.results = sorted_list
+
+    def StartEnd(self, args):
+        """
+        Find all intervals between two sets of occurrences.
+        "StartEnd": [[list of words], [list of words]
+        """
+        query = self.parse_json(args)
+        start_words = [*query['StartEnd']][0]
+        end_words = [*query['StartEnd']][1]
+
+        self.base_query.MustContainWords(*start_words)
+        temp1 = self.base_query.results
+
+        self.base_query = self.get_query()  # reset query for next round
+        self.base_query.MustContainWords(*end_words)
+        temp2 = self.base_query.results
+
+        temp2.extend(temp1)  # not the right way to do this - if we join, we loose info on originating query
+        self.base_query.results = temp2
+
+        test = "wait here"

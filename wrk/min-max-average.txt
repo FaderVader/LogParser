@@ -1,0 +1,57 @@
+{
+	"find": ['word', 'word'],
+	"between": [date1, date2],
+	"client": name
+}
+
+toList()
+take(int)
+
+
+find max, min, avarage
+for session-start elapsed time
+
+build list of match 1
+for every client in result:
+	find first occurence of match 2 after
+	
+	build list [{logline-start, logline-end}, {}...]
+	
+	for every pair:
+		calculate time-span
+		add to binary search tree
+	traverse tree inOrder -> list
+	 min 5: return first 5
+	 max 5: return last 5
+	 average
+	
+match 1:
+{
+	"find": ['setupsession', 'running']
+}
+
+for every match {
+	{
+		"find": ['setupsession', 'completed'],
+		"client": match 1 client
+		"after": match 1 time
+	}
+
+	take first
+	add to list 'start-stop' : {match1, match2}
+}
+
+for every pair in list {
+	get time diff
+	add td to bst
+}
+
+bst.inOrder -> list
+return list first 5
+return list last 5
+sum all, divide by item-count -> return average
+
+intersect: found common occurences in two lists
+? exclude(list1, list2): return items in list1 that does not exist in list2
+? join(list1, list2): return the combined elements
+
