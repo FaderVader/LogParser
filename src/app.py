@@ -8,7 +8,7 @@ queryParser = QueryParser()
 # queryParser.Parse(q2)
 
 # q = '{"Find": ["setupsession", "running"], "Between": ["2020-10-01-0:0:0.0", "2020-10-02-23:59:59.9"], "Client": "TX82564", "Sort": 1}'
-q = '{"StartEnd": [["setupsession", "running"], ["setupsession", "completed"]], "Between": ["2020-10-01-0:0:0.0", "2020-10-02-23:59:59.9"], "Client": "TX82564", "Sort": 1}'
+q = '{"StartEnd": [["setupsession", "running"], ["setupsession", "completed"]]}'
 result = queryParser.Parse(q)
 
 print('done')

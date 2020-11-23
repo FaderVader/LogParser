@@ -1,5 +1,6 @@
 from Query import Query
 from PrepareTrie import PrepareTrie
+from LogLine import LogLine
 import json
 import inspect
 
@@ -81,13 +82,27 @@ class QueryParser:
         end_words = [*query['StartEnd']][1]
 
         self.base_query.MustContainWords(*start_words)
-        temp1 = self.base_query.results
+        start_results = self.base_query.results.copy()
 
-        self.base_query = self.get_query()  # reset query for next round
+        self.base_query = self.get_query()  
         self.base_query.MustContainWords(*end_words)
-        temp2 = self.base_query.results
+        end_results = self.base_query.results.copy()
 
-        temp2.extend(temp1)  # not the right way to do this - if we join, we loose info on originating query
-        self.base_query.results = temp2
+        for result in start_results:
+            self.base_query.results = start_results.copy()
+            actual_line_start = self.base_query.getLine(result)
+            actual_line_start_time = LogLine.parseTimeStampToString(actual_line_start.GetTimeStamp())
 
-        test = "wait here"
+            self.base_query.results = end_results.copy()
+            self.base_query.MustBeFromClient(result.client)
+            self.base_query.MustBeAfter(actual_line_start_time)
+            try:
+                line_end = self.base_query.results[0]  # will pop exception after last item - should catch
+                actual_line_end = self.base_query.getLine(line_end)
+                print(result)
+                print(f'{LogLine.parseTimeStampToString(actual_line_start.GetTimeStamp())} {actual_line_start.GetPayLoad()}')
+                print(f'{LogLine.parseTimeStampToString(actual_line_end.GetTimeStamp())} {actual_line_end.GetPayLoad()}')
+                print('\n')
+            except: continue
+
+            test = "wait here"
