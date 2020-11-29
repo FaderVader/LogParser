@@ -1,14 +1,14 @@
 """
 This module loads all log-files from designated folder
 """
-
 from LogLine import LogLine
+
 
 def loadOneLogfile(path):
     allLines = []
     with open(path) as file:
         for line in file:
-            allLines.append(LogLine(line))
+            allLines.append(LogLine(line.replace('\n', '')))  # remove trailing newline
     return allLines
 
 

@@ -22,8 +22,14 @@ class QueryParser:
         self.logs = trie.GetStructuredLogs()  # get the files in structured format
 
     def parse_json(self, query):
-        data = json.loads(query)
-        return data
+        if isinstance(query, str):
+            return json.loads(query)
+        else:
+            return query
+
+    def get_args_from_query(self, query, element):
+        arguments = query.__getattribute__(element)
+        return arguments
 
     def get_query(self):
         """
@@ -37,7 +43,7 @@ class QueryParser:
         all_members = inspect.getmembers(QueryParser, inspect.isfunction)
 
         for query in self.query_methods:
-            if query in user_query:
+            if query in user_query._fields and user_query.__getattribute__(query) is not None:  # _fields: attribute containing the fields of the tuple
                 for function_name, function_obj in all_members:
                     if query == function_name:
                         method = getattr(QueryParser, function_name)
@@ -55,17 +61,17 @@ class QueryParser:
     # eDSL key-words 
     def Find(self, args):
         query = self.parse_json(args)
-        arguments = [*query['Find']]
+        arguments = [*self.get_args_from_query(query, 'Find')]
         self.base_query.MustContainWords(*arguments)
 
     def Between(self, args):
         query = self.parse_json(args)
-        arguments = [*query['Between']]
+        arguments = [*self.get_args_from_query(query, 'Between')]
         self.base_query.MustBetween(*arguments)
 
     def Client(self, args):
         query = self.parse_json(args)
-        arguments = query['Client']
+        arguments = self.get_args_from_query(query, 'Client')
         self.base_query.MustBeFromClient(arguments)
 
     def Sort(self, args):
@@ -82,11 +88,11 @@ class QueryParser:
         end_words = [*query['StartEnd']][1]
 
         self.base_query.MustContainWords(*start_words)
-        start_results = self.base_query.results.copy()
+        start_results = self.base_query.results.copy()  # avoid by-ref 
 
         self.base_query = self.get_query()  
         self.base_query.MustContainWords(*end_words)
-        end_results = self.base_query.results.copy()
+        end_results = self.base_query.results.copy()  # avoid by-ref
 
         for result in start_results:
             self.base_query.results = start_results.copy()
@@ -102,7 +108,5 @@ class QueryParser:
                 print(result)
                 print(f'{LogLine.parseTimeStampToString(actual_line_start.GetTimeStamp())} {actual_line_start.GetPayLoad()}')
                 print(f'{LogLine.parseTimeStampToString(actual_line_end.GetTimeStamp())} {actual_line_end.GetPayLoad()}')
-                print('\n')
+                print('')
             except: continue
-
-            test = "wait here"
