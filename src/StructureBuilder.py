@@ -4,6 +4,7 @@
     - for every log-file, build list of lines, then set 2. dict value to list
 """
 
+
 class StructureBuilder:
 
     client_name_stripper = lambda name: (name[19:])[:-9]
@@ -21,7 +22,7 @@ class StructureBuilder:
             clientName = StructureBuilder.client_name_stripper(file)
             clients.add(clientName)
 
-        clients_dict = {clientName : {} for clientName in list(clients)} #dict.fromkeys(list(clients), {})
+        clients_dict = {clientName: {} for clientName in list(clients)}  # dict.fromkeys(list(clients), {})
         return clients_dict
 
     @staticmethod
@@ -33,7 +34,7 @@ class StructureBuilder:
 
         for client in clientDict:
             client_list = []
-            for file in filelist:  # refactor: we should pop item from list. File can only be added once
+            for file in filelist:  # TODO refactor: we should pop item from list. File can only be added once
                 if client in file:
                     client_list.append(StructureBuilder.file_name_stripper(file)) 
             clientDict[client] = dict.fromkeys(client_list, [])
@@ -44,3 +45,4 @@ class StructureBuilder:
         dict_of_clients = StructureBuilder._buildClientDict(fileList)        
         dict_of_clients_of_files = StructureBuilder._buildFileDict(dict_of_clients, fileList)
         return dict_of_clients_of_files
+        

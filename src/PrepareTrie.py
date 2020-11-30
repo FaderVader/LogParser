@@ -14,7 +14,8 @@ class PrepareTrie:
 
     def loadLogs(self):
         """
-        Transform all log-files into trie-structure
+        Transform all log-files into trie-structure:
+        [client][file][linenumber]
         """
         trie = LogTrie()
         for client in self.fileStructure:
