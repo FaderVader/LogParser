@@ -1,11 +1,10 @@
-"""
-This class represents a single line from a log-file
-"""
-
 from datetime import datetime
 
 
 class LogLine():
+    """
+    This class is used for encapsulating a single line from a log-file.
+    """
     def __init__(self, logLine):
         self.lineElements = self.readLineElements(logLine)
 
@@ -31,19 +30,19 @@ class LogLine():
         return (timeStamp, payload)
 
     @staticmethod
-    def ConvertStringToTime(date_args): #date_args = '2020-09-04-18:16:12.1515421' '2020-09-29T08:42:42.0346299+02:00'
+    def ConvertStringToTime(date_args):  # date_args = '2020-09-04-18:16:12.1515421' '2020-09-29T08:42:42.0346299+02:00'
         try:
             timeString = date_args.replace('T', '-')
-            timeString = timeString[0:26] # remove '+02:00' + trim milisec part down
+            timeString = timeString[0:26]  # remove '+02:00' + trim milisec part down
 
             date = datetime.strptime(timeString, "%Y-%m-%d-%H:%M:%S.%f")
-            return date.timestamp() # convert to UNIX time
+            return date.timestamp()  # convert to UNIX time
         except:
             return ''
 
     @staticmethod
     def ConvertTimestampToString(timestamp):
-        time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d-%H:%M:%S.%f') # convert from UNIX time
+        time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d-%H:%M:%S.%f')  # convert from UNIX time
         return time
 
 

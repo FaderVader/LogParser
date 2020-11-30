@@ -1,14 +1,14 @@
 from Query import Query
 from PrepareTrie import PrepareTrie
 from LogLine import LogLine
+from Types import IntervalPair as IntervalPair
 import json
 import inspect
-from collections import namedtuple
 
 
 class QueryParser:
     """
-    Frontend for queries. Instantiating invokes primary trie-building.
+    Frontend for queries. Primary trie-building is invoked on instantiating.
     """
     def __init__(self):
         self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']
@@ -22,6 +22,7 @@ class QueryParser:
         self.loaded_trie = trie.GetLogTrie()  # load log-trie
         self.logs = trie.GetStructuredLogs()  # get the files in structured format
 
+    # parsing utils
     def parse_json(self, query):
         if isinstance(query, str):
             return json.loads(query)
@@ -84,7 +85,6 @@ class QueryParser:
         Find all intervals between two sets of occurrences.
         "StartEnd": [[list of words], [list of words]
         """
-        IntervalPair = namedtuple("IntervalPair", "delta pointer_A pointer_B")
         IntervalPairs = []
 
         query = self.parse_json(args)

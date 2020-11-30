@@ -1,6 +1,7 @@
-from Tries import SearchTrie, LogTrie
+from Tries import SearchTrie
 from LogLine import LogLine
 from BinarySearchTree import BST
+from Types import Terminator as Terminator
 import inspect
 
 
@@ -112,7 +113,7 @@ class Query:
         sorted_list = []
         for line in sorted:
             pointer_parts = line.split('##')[1].split('#')  # re-creating pointer as Terminator tuple
-            term = LogTrie.Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]))
+            term = Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]))
             sorted_list.append(term)
         return sorted_list
 

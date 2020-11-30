@@ -1,5 +1,5 @@
 from QueryParser import QueryParser
-from collections import namedtuple
+from Types import QuerySyntax as QuerySyntax
 
 queryParser = QueryParser()
 # q = '{"Find": ["setupsession", "running"], "Between": ["2020-10-06-0:0:0.0", "2020-10-06-23:59:59.9"], "Client": "TX82564"}'
@@ -10,11 +10,9 @@ queryParser = QueryParser()
 
 # q = '{"Find": ["setupsession", "running"], "Between": ["2020-10-01-0:0:0.0", "2020-10-02-23:59:59.9"], "Client": "TX82564", "Sort": 1}'
 
-Query = namedtuple("Query", "StartEnd Find Between Client Sort")
-
 
 def query(StartEnd=None, Find=None, Between=None, Client=None, Sort=None):
-    return Query(StartEnd, Find, Between, Client, Sort)
+    return QuerySyntax(StartEnd, Find, Between, Client, Sort)
 
 
 q = query(StartEnd=[["setupsession", "running"], ["setupsession", "completed"]])

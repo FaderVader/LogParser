@@ -1,0 +1,14 @@
+"""
+Public namedtuples 
+"""
+
+from collections import namedtuple
+
+# pointer to occurence of node in source-file
+Terminator = namedtuple("Terminator", "client date linenumber")
+
+# used in app.py
+QuerySyntax = namedtuple("QuerySyntax", "StartEnd Find Between Client Sort")
+
+# used in QueryParser.StartEnd
+IntervalPair = namedtuple("IntervalPair", "delta pointer_A pointer_B")

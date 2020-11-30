@@ -1,5 +1,6 @@
 from Loader import Loader
 from Tries import LogTrie
+from Types import Terminator as Terminator
 
 
 class PrepareTrie:
@@ -18,7 +19,7 @@ class PrepareTrie:
         for client in self.fileStructure:
             for log in self.fileStructure[client]:
                 log_file = self.all_files[client][log]
-                value = LogTrie.Terminator(client, log, None)
+                value = Terminator(client, log, None)
                 trie.AddLog(log_file, value)
         self.log_trie = trie
 

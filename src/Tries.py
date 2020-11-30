@@ -1,4 +1,4 @@
-from collections import namedtuple
+from Types import Terminator as Terminator
 import re
 
 
@@ -19,9 +19,6 @@ class LogTrie:
     """
     def __init__(self):
         self.root = Node()
-
-    # pointer to occurence of node in source-file
-    Terminator = namedtuple("Terminator", "client date linenumber")
 
     # actual trie builder
     def addWord(self, word, terminator):
@@ -57,7 +54,7 @@ class LogTrie:
         """
         for linenumber, line in enumerate(logFile):
             text = line.GetPayLoad()
-            lineId = self.Terminator(terminator.client, terminator.date, linenumber)
+            lineId = Terminator(terminator.client, terminator.date, linenumber)
             self.addLine(text, lineId)
 
     def FindWord(self, word):
