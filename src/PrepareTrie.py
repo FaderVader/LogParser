@@ -1,18 +1,15 @@
-from FileLoader import LoadLogsFromStructure
-from StructureBuilder import StructureBuilder
+from Loader import Loader
 from Tries import LogTrie
-from FindLogsInFolder import GetListOfFiles
 
 
 class PrepareTrie:
-    def __init__(self, base_path='./testSources/'):
-        self.base_path = base_path     # config - if debug: './testSources/'   if run from shell: '../testSources/'
-        self.logList = GetListOfFiles(self.base_path)
-        self.fileStructure = StructureBuilder.CreateFileStructure(self.logList)
-        self.all_files = LoadLogsFromStructure(self.fileStructure, self.base_path)
+    def __init__(self):
+        loader = Loader()
+        self.fileStructure = loader.GetStructure()
+        self.all_files = loader.GetStructuredLogs()
         self.log_trie = None
 
-    def loadLogs(self):
+    def buildTrie(self):
         """
         Transform all log-files into trie-structure:
         [client][file][linenumber]
@@ -30,7 +27,7 @@ class PrepareTrie:
         Get trie from all logs
         """
         if self.log_trie is None:
-            self.loadLogs()
+            self.buildTrie()
         return self.log_trie
 
     def GetStructuredLogs(self):

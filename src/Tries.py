@@ -1,10 +1,3 @@
-"""
-Build trie from logfile:
-    - get one log file, parse each line
-    - add every word to shared Trie-structure
-        terminator is reference to {client, date, linenumber}
-
-"""
 from collections import namedtuple
 import re
 
@@ -18,7 +11,11 @@ class Node:
 
 class LogTrie:
     """
-    Main container for content of all log-files
+    Main container for content of all log-files.
+    Build trie from logfile:
+    - get one log file, parse each line
+    - add every word to shared Trie-structure
+    Terminator is reference to {client, date, linenumber}
     """
     def __init__(self):
         self.root = Node()
@@ -55,7 +52,8 @@ class LogTrie:
     def AddLog(self, logFile, terminator=Terminator('*', '*', '*')):
         """
         Takes a log-file as argument and split into lines.
-        The terminator-items should be [client][filedate]
+        The terminator-items should be: [client][filedate]
+        - Linenumber identifier will be added during line-by-line parsing.
         """
         for linenumber, line in enumerate(logFile):
             text = line.GetPayLoad()

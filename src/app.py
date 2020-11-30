@@ -18,8 +18,8 @@ def query(StartEnd=None, Find=None, Between=None, Client=None, Sort=0):
 
 # q = '{"StartEnd": [["setupsession", "running"], ["setupsession", "completed"]]}'
 
-# q = query(StartEnd=[["setupsession", "running"], ["setupsession", "completed"]])
-q = query(Find=["setupsession", "running"], Client="AX82017", Between=["2020-10-01-0:0:0.0", "2020-10-02-23:59:59.9"], Sort=1)
+q = query(StartEnd=[["setupsession", "running"], ["setupsession", "completed"]])
+# q = query(Find=["setupsession", "running"], Client="AX82017", Between=["2020-10-01-0:0:0.0", "2020-10-02-23:59:59.9"], Sort=1)
 
 result = queryParser.Parse(q)
 

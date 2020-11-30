@@ -1,21 +1,21 @@
-""" 
+class StructureBuilder:
+    """ 
     - build list of unique client-names -> create dict, key: clientname
     - build list of unique log-files pr client -> create dict, key: filename
     - for every log-file, build list of lines, then set 2. dict value to list
-"""
-
-
-class StructureBuilder:
+    """
 
     client_name_stripper = lambda name: (name[19:])[:-9]
     file_name_stripper = lambda filename: (filename[-8:])
 
     @staticmethod
-    def _buildClientDict(fileList):
-        # iterate over list of file-names:
-        #   extract clientname from string
-        #   add name to {set}, to ensure unique items
-        # when done, convert set to {dict}, key=clientname, value={}
+    def build_clientDict(fileList):
+        """
+        Iterate over list of file-names:
+        - extract clientname from string
+        - add name to {set}, to ensure unique items
+        When done, convert set to {dict}, key=clientname, value={}
+        """
 
         clients = set()
         for file in fileList:
@@ -26,11 +26,13 @@ class StructureBuilder:
         return clients_dict
 
     @staticmethod
-    def _buildFileDict(clientDict, filelist):
-        # iterate over list of file-names:
-        #  extract clientname from string
-        #   add file-name of matched client-key to temp-list
-        # when done, convert temp-list to {dict}, value=[]
+    def build_fileDict(clientDict, filelist):
+        """
+        Iterate over list of file-names:
+        - extract clientname from string
+        - add file-name of matched client-key to temp-list
+        When done, convert temp-list to {dict}, value=[]
+        """
 
         for client in clientDict:
             client_list = []
@@ -42,7 +44,9 @@ class StructureBuilder:
 
     @staticmethod
     def CreateFileStructure(fileList):
-        dict_of_clients = StructureBuilder._buildClientDict(fileList)        
-        dict_of_clients_of_files = StructureBuilder._buildFileDict(dict_of_clients, fileList)
+        """
+        Based on list of files, return a data-structure for storing log-lines: { client { logfile [ (timestamp, payload) ] } }
+        """
+        dict_of_clients = StructureBuilder.build_clientDict(fileList)        
+        dict_of_clients_of_files = StructureBuilder.build_fileDict(dict_of_clients, fileList)
         return dict_of_clients_of_files
-        
