@@ -19,7 +19,7 @@ def test_LogLine_Should_Convert_Timestamp_To_TrueDate():
     expected_result = '2020-09-29-08:42:42.034629'
 
     # Act
-    date_as_string = LogLine.parseTimeStampToString(date_as_epoch)
+    date_as_string = LogLine.ConvertTimestampToString(date_as_epoch)
 
     # Assert
     assert date_as_string == expected_result

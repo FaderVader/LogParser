@@ -1,6 +1,7 @@
 from Tries import SearchTrie, LogTrie
 from LogLine import LogLine
 from BinarySearchTree import BST
+import inspect
 
 
 class Query:
@@ -12,9 +13,6 @@ class Query:
         self.search_trie = SearchTrie()
         self.all_files = all_files
         self.results = None
-
-    def getLine(self, pointer):
-        return self.all_files[pointer.client][pointer.date][pointer.linenumber]
 
     def buildSearchTrie(self, *args):
         """
@@ -31,6 +29,9 @@ class Query:
             # build trie of pointers, terminator indicates number of hits
             for match in matches:
                 self.search_trie.addPointer(match)
+
+    def GetLine(self, pointer):
+        return self.all_files[pointer.client][pointer.date][pointer.linenumber]
 
     def MustContainWords(self, *args):
         """
@@ -61,11 +62,11 @@ class Query:
         """
         Truncate Query.results to only events before 
         """
-        end_date_epoch = LogLine.parseStringToTime(date)
+        end_date_epoch = LogLine.ConvertStringToTime(date)
         local_results = []
 
         for pointer in self.results:
-            actual_line = self.getLine(pointer)
+            actual_line = self.GetLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
             if (time_stamp <= end_date_epoch):
                 local_results.append(pointer)
@@ -75,11 +76,11 @@ class Query:
         """
         Truncate Query.results to only events after
         """
-        start_date_epoch = LogLine.parseStringToTime(date)
+        start_date_epoch = LogLine.ConvertStringToTime(date)
         local_results = []
 
         for pointer in self.results:
-            actual_line = self.getLine(pointer)
+            actual_line = self.GetLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
             if (time_stamp >= start_date_epoch):
                 local_results.append(pointer)
@@ -104,14 +105,13 @@ class Query:
         bst = BST()
 
         for pointer in self.results:
-            # print(pointer) #  Terminator(client='TX82564', date='20201006', linenumber=279)
-            actual_line = self.getLine(pointer)
-            bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}')  # add pointer-as-string instead?
+            actual_line = self.GetLine(pointer)
+            bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}')  # store pointer as string for later deconstruct
 
         sorted = bst.inOrder()
         sorted_list = []
         for line in sorted:
-            pointer_parts = line.split('##')[1].split('#') 
+            pointer_parts = line.split('##')[1].split('#')  # re-creating pointer as Terminator tuple
             term = LogTrie.Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]))
             sorted_list.append(term)
         return sorted_list
@@ -121,11 +121,15 @@ class Query:
         Print the content of Query.results.
         Add argument 'format=1' to print time in true date, otherwise epoch.
         """
+
+        if len(self.results) <= 0:
+            return
+
         for pointer in self.results:
-            actual_line = self.getLine(pointer)
+            actual_line = self.GetLine(pointer)
             print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
             if format != 0:
-                time = LogLine.parseTimeStampToString(actual_line.GetTimeStamp())
+                time = LogLine.ConvertTimestampToString(actual_line.GetTimeStamp())
             else:
                 time = actual_line.GetTimeStamp()
 

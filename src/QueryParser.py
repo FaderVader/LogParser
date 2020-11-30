@@ -3,6 +3,7 @@ from PrepareTrie import PrepareTrie
 from LogLine import LogLine
 import json
 import inspect
+from collections import namedtuple
 
 
 class QueryParser:
@@ -83,9 +84,12 @@ class QueryParser:
         Find all intervals between two sets of occurrences.
         "StartEnd": [[list of words], [list of words]
         """
+        IntervalPair = namedtuple("IntervalPair", "delta pointer_A pointer_B")
+        IntervalPairs = []
+
         query = self.parse_json(args)
-        start_words = [*query['StartEnd']][0]
-        end_words = [*query['StartEnd']][1]
+        start_words = [*self.get_args_from_query(query, 'StartEnd')[0]]
+        end_words = [*self.get_args_from_query(query, 'StartEnd')[1]]
 
         self.base_query.MustContainWords(*start_words)
         start_results = self.base_query.results.copy()  # avoid by-ref 
@@ -96,17 +100,29 @@ class QueryParser:
 
         for result in start_results:
             self.base_query.results = start_results.copy()
-            actual_line_start = self.base_query.getLine(result)
-            actual_line_start_time = LogLine.parseTimeStampToString(actual_line_start.GetTimeStamp())
+            actual_line_start = self.base_query.GetLine(result)
+            actual_line_start_time = LogLine.ConvertTimestampToString(actual_line_start.GetTimeStamp())
 
             self.base_query.results = end_results.copy()
             self.base_query.MustBeFromClient(result.client)
             self.base_query.MustBeAfter(actual_line_start_time)
             try:
-                line_end = self.base_query.results[0]  # will pop exception after last item - should catch
-                actual_line_end = self.base_query.getLine(line_end)
-                print(result)
-                print(f'{LogLine.parseTimeStampToString(actual_line_start.GetTimeStamp())} {actual_line_start.GetPayLoad()}')
-                print(f'{LogLine.parseTimeStampToString(actual_line_end.GetTimeStamp())} {actual_line_end.GetPayLoad()}')
-                print('')
-            except: continue
+                line_end = self.base_query.results[0]  # throws exception if no end-match is found - then we skip pair
+                actual_line_end = self.base_query.GetLine(line_end)
+
+                t_delta = actual_line_end.GetTimeStamp() - actual_line_start.GetTimeStamp()
+                pair = IntervalPair(t_delta, result, line_end)
+                IntervalPairs.append(pair)
+            except: continue  
+
+        self.base_query.results = []  # ensure queue is empty after parsing
+
+        for pair in IntervalPairs:
+            t_delta = pair.delta
+            pointer_start = self.base_query.GetLine(pair.pointer_A)
+            pointer_end = self.base_query.GetLine(pair.pointer_B)
+
+            print(pair.pointer_A, LogLine.ConvertTimestampToString(t_delta))
+            print(f'{LogLine.ConvertTimestampToString(pointer_start.GetTimeStamp())} {pointer_start.GetPayLoad()}')
+            print(f'{LogLine.ConvertTimestampToString(pointer_end.GetTimeStamp())} {pointer_end.GetPayLoad()}')
+            print('')

@@ -12,11 +12,10 @@ queryParser = QueryParser()
 
 Query = namedtuple("Query", "StartEnd Find Between Client Sort")
 
-def query(StartEnd=None, Find=None, Between=None, Client=None, Sort=0):
+
+def query(StartEnd=None, Find=None, Between=None, Client=None, Sort=None):
     return Query(StartEnd, Find, Between, Client, Sort)
 
-
-# q = '{"StartEnd": [["setupsession", "running"], ["setupsession", "completed"]]}'
 
 q = query(StartEnd=[["setupsession", "running"], ["setupsession", "completed"]])
 # q = query(Find=["setupsession", "running"], Client="AX82017", Between=["2020-10-01-0:0:0.0", "2020-10-02-23:59:59.9"], Sort=1)
