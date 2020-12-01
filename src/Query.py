@@ -2,7 +2,8 @@ from Tries import SearchTrie
 from LogLine import LogLine
 from BinarySearchTree import BST
 from Types import Terminator as Terminator
-import inspect
+from Types import IntervalPair as IntervalPair
+# import inspect
 
 
 class Query:
@@ -21,6 +22,7 @@ class Query:
         Put returned pointers into sub-trie.
         """
         args_as_list = [*args]
+        self.search_trie = SearchTrie()
 
         for arg in args_as_list:            
             # get pointer to matches for every word
@@ -108,6 +110,7 @@ class Query:
         for pointer in self.results:
             actual_line = self.GetLine(pointer)
             bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}#{pointer.payload}')  # store pointer as string for later deconstruct
+             # TODO: we should encapsulate in a method
 
         sorted = bst.inOrder()
         sorted_list = []
@@ -117,6 +120,49 @@ class Query:
             term = Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]), pointer_parts[3])
             sorted_list.append(term)
         return sorted_list
+
+    def StartEnd(self, start_words, end_words):
+        """
+        Find all intervals between two sets of occurrences.
+        "StartEnd": [[list of words], [list of words]
+        """
+        IntervalPairs = []
+
+        self.MustContainWords(*start_words)
+        start_results = self.results.copy()  # avoid by-ref 
+
+        self.MustContainWords(*end_words)
+        end_results = self.results.copy()  # avoid by-ref
+
+        # TODO : pairs MUST be from same file (sanity check)
+
+        for line_start in start_results:
+            self.results = start_results.copy()
+            actual_line_start = self.GetLine(line_start)
+            actual_line_start_time = LogLine.ConvertTimestampToString(actual_line_start.GetTimeStamp())
+
+            self.results = end_results.copy()
+            self.MustBeFromClient(line_start.client)
+            self.MustBeAfter(actual_line_start_time)
+            try:
+                line_end = self.results[0]  # throws exception if no end-match is found -> then we skip pair
+                actual_line_end = self.GetLine(line_end)
+
+                t_delta = actual_line_end.GetTimeStamp() - actual_line_start.GetTimeStamp()
+                pair = IntervalPair(t_delta, line_start, line_end)
+                IntervalPairs.append(pair)
+            except: continue  
+
+        interval_results = []
+        for pair in IntervalPairs:
+            t_delta = pair.delta
+
+            # payload format: $$delta $end-client $end-date $end-linenumber
+            payload = f'$${str(t_delta)}${pair.pointer_B.client}${pair.pointer_B.date}${pair.pointer_B.linenumber}'  # TODO: we should encapsulate in a method
+            term = Terminator(pair.pointer_A.client, pair.pointer_A.date, pair.pointer_A.linenumber, payload)
+            interval_results.append(term)
+
+        self.results = interval_results
 
     def ShowResults(self, format=0):
         """
@@ -128,11 +174,24 @@ class Query:
             return
 
         for pointer in self.results:
-            actual_line = self.GetLine(pointer)
-            print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
-            if format != 0:
-                time = LogLine.ConvertTimestampToString(actual_line.GetTimeStamp())
-            else:
-                time = actual_line.GetTimeStamp()
+            if pointer.payload is None:  # standard result-type - one line            
+                self.print_logLine(pointer, format)
 
-            print(time, actual_line.GetPayLoad())
+            else:  # extended resulttype - payload has reference to second line
+                payload_parts = pointer.payload.split('$$')[1].split('$')
+                delta_t = payload_parts[0]
+                second_line = Terminator(payload_parts[1], payload_parts[2], int(payload_parts[3]), None)
+                print(f'delta: {delta_t}')
+                self.print_logLine(pointer, format)
+                self.print_logLine(second_line, format)
+                print('--')
+
+    def print_logLine(self, pointer, format=0):
+        actual_line = self.GetLine(pointer)
+        print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
+
+        if format != 0:
+            time = LogLine.ConvertTimestampToString(actual_line.GetTimeStamp())
+        else:
+            time = actual_line.GetTimeStamp()
+        print(time, actual_line.GetPayLoad())
