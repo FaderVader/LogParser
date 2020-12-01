@@ -46,7 +46,7 @@ class LogTrie:
         for word in words:
             self.addWord(word, terminator)
 
-    def AddLog(self, logFile, terminator=Terminator('*', '*', '*')):
+    def AddLog(self, logFile, terminator=Terminator('*', '*', '*', None)):
         """
         Takes a log-file as argument and split into lines.
         The terminator-items should be: [client][filedate]
@@ -54,7 +54,7 @@ class LogTrie:
         """
         for linenumber, line in enumerate(logFile):
             text = line.GetPayLoad()
-            lineId = Terminator(terminator.client, terminator.date, linenumber)
+            lineId = Terminator(terminator.client, terminator.date, linenumber, None)
             self.addLine(text, lineId)
 
     def FindWord(self, word):

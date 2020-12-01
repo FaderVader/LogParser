@@ -59,7 +59,7 @@ class Query:
         self.MustBeAfter(start_date)
         self.MustBeFore(end_date)
 
-    def MustBeFore(self, date):
+    def MustBeFore(self, date):  # TODO we should sort .results and stop iterating after first match, then slice the list
         """
         Truncate Query.results to only events before 
         """
@@ -73,7 +73,7 @@ class Query:
                 local_results.append(pointer)
         self.results = local_results
 
-    def MustBeAfter(self, date):
+    def MustBeAfter(self, date):  # TODO we should sort .results and stop iterating after first match, then slice the list
         """
         Truncate Query.results to only events after
         """
@@ -107,13 +107,14 @@ class Query:
 
         for pointer in self.results:
             actual_line = self.GetLine(pointer)
-            bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}')  # store pointer as string for later deconstruct
+            bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}#{pointer.payload}')  # store pointer as string for later deconstruct
 
         sorted = bst.inOrder()
         sorted_list = []
         for line in sorted:
             pointer_parts = line.split('##')[1].split('#')  # re-creating pointer as Terminator tuple
-            term = Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]))
+            if pointer_parts[3] == "None": pointer_parts[3] = None  # survive the stringiness
+            term = Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]), pointer_parts[3])
             sorted_list.append(term)
         return sorted_list
 

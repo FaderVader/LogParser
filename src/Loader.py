@@ -4,7 +4,7 @@ from os import listdir
 
 
 class Loader:
-    def __init__(self, base_path='./testSources/', app_name='GalaxySiteSelector', file_ext='.log'): 
+    def __init__(self, base_path='../testSources/', app_name='GalaxySiteSelector', file_ext='.log'): 
         self.base_path = base_path  # config - if debug: './testSources/'   if run from shell: '../testSources/'
         self.app_name = app_name
         self.file_ext = file_ext

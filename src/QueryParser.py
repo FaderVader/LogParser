@@ -1,6 +1,7 @@
 from Query import Query
 from PrepareTrie import PrepareTrie
 from LogLine import LogLine
+from Types import Terminator as Terminator
 from Types import IntervalPair as IntervalPair
 import json
 import inspect
@@ -98,31 +99,38 @@ class QueryParser:
         self.base_query.MustContainWords(*end_words)
         end_results = self.base_query.results.copy()  # avoid by-ref
 
-        for result in start_results:
+        for line_start in start_results:
             self.base_query.results = start_results.copy()
-            actual_line_start = self.base_query.GetLine(result)
+            actual_line_start = self.base_query.GetLine(line_start)
             actual_line_start_time = LogLine.ConvertTimestampToString(actual_line_start.GetTimeStamp())
 
             self.base_query.results = end_results.copy()
-            self.base_query.MustBeFromClient(result.client)
+            self.base_query.MustBeFromClient(line_start.client)
             self.base_query.MustBeAfter(actual_line_start_time)
             try:
                 line_end = self.base_query.results[0]  # throws exception if no end-match is found - then we skip pair
                 actual_line_end = self.base_query.GetLine(line_end)
 
                 t_delta = actual_line_end.GetTimeStamp() - actual_line_start.GetTimeStamp()
-                pair = IntervalPair(t_delta, result, line_end)
+                pair = IntervalPair(t_delta, line_start, line_end)
                 IntervalPairs.append(pair)
             except: continue  
 
         self.base_query.results = []  # ensure queue is empty after parsing
 
+        interval_results = []
         for pair in IntervalPairs:
             t_delta = pair.delta
             pointer_start = self.base_query.GetLine(pair.pointer_A)
             pointer_end = self.base_query.GetLine(pair.pointer_B)
 
+            payload = f'##{str(t_delta)}#{pair.pointer_B.client}#{pair.pointer_B.date}#{pair.pointer_B.linenumber}'
+            term = Terminator(pair.pointer_A.client, pair.pointer_A.date, pair.pointer_A.linenumber, payload)
+            interval_results.append(term)
+
             print(pair.pointer_A, LogLine.ConvertTimestampToString(t_delta))
             print(f'{LogLine.ConvertTimestampToString(pointer_start.GetTimeStamp())} {pointer_start.GetPayLoad()}')
             print(f'{LogLine.ConvertTimestampToString(pointer_end.GetTimeStamp())} {pointer_end.GetPayLoad()}')
             print('')
+
+        self.base_query.results = interval_results
