@@ -37,7 +37,7 @@ class Loader:
                 allLines.append(LogLine(line.replace('\n', '')))  # remove trailing newline
         return allLines
 
-    # wrap StructureBuilder in method, Loader should be sole direct dependancy in QueryParser
+    # wrap StructureBuilder in method, Loader should be sole direct dependancy in Query
     def GetStructure(self):
         """
         Get structure for holding logfiles
@@ -49,7 +49,7 @@ class Loader:
 
     def GetStructuredLogs(self): 
         """
-        Using pre-build structure, load all logs into structure [client][file][linenumber]
+        Using pre-build structure-scaffold, load all logs into structure [client][file][linenumber]
         """
         fileStructure = self.GetStructure()
         app_name = self.app_name

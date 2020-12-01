@@ -1,20 +1,27 @@
 from Tries import SearchTrie
 from LogLine import LogLine
 from BinarySearchTree import BST
+from PrepareTrie import PrepareTrie
 from Types import Terminator as Terminator
 from Types import IntervalPair as IntervalPair
-# import inspect
 
 
 class Query:
     """
-    Low-level, generic methods for querying trie.
+    Low-level, generic methods for querying trie. Primary trie-building is invoked on instantiating.
     """
-    def __init__(self, log_trie, all_files):
-        self.log_trie = log_trie
+    def __init__(self):
+        self.log_trie = None      # main trie - contains content of all logs
+        self.all_files = None     # all log-files in structured object
+        self.search_trie = None   # trie used for coordinating word-searches
+        self.results = None       # aggregated result-set
+        self.setup()
+
+    def setup(self):
+        trie = PrepareTrie()                       # setup the tries
+        self.log_trie = trie.GetLogTrie()          # load log-trie
+        self.all_files = trie.GetStructuredLogs()  # get the files in structured format
         self.search_trie = SearchTrie()
-        self.all_files = all_files
-        self.results = None
 
     def buildSearchTrie(self, *args):
         """
@@ -170,14 +177,16 @@ class Query:
         Add argument 'format=1' to print time in true date, otherwise epoch.
         """
 
-        if len(self.results) <= 0:
+        if len(self.results) <= 0:  # don't print if there's nothing to show
             return
 
         for pointer in self.results:
-            if pointer.payload is None:  # standard result-type - one line            
+            if pointer.payload is None:  
+                # standard result-type - one line            
                 self.print_logLine(pointer, format)
 
-            else:  # extended resulttype - payload has reference to second line
+            else:  
+                # extended resulttype - payload has reference to second line
                 payload_parts = pointer.payload.split('$$')[1].split('$')
                 delta_t = payload_parts[0]
                 second_line = Terminator(payload_parts[1], payload_parts[2], int(payload_parts[3]), None)

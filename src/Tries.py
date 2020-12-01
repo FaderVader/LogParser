@@ -15,7 +15,7 @@ class LogTrie:
     Build trie from logfile:
     - get one log file, parse each line
     - add every word to shared Trie-structure
-    Terminator is reference to {client, date, linenumber}
+    Terminator is reference to {client, date, linenumber, (payload)}
     """
     def __init__(self):
         self.root = Node()
