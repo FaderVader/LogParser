@@ -1,0 +1,13 @@
+Welcome to the interactive LogParser shell.
+Available commands:
+
+startend [start-terms, end-terms] (startend setupsession running, setupsession completed)
+find [list of search-terms]       (find setupsession running)
+between [start-date end-date]     (between 2020-01-01 2020-01-15)
+client [client name]              (client AX82017)
+sort [value]                      (sort 1)
+
+show:     show current query
+execute:  execute current query
+reset:    reset all parameters
+exit:     stop LogParser
