@@ -3,7 +3,7 @@ Available commands:
 
 startend [start-terms, end-terms] (startend setupsession running, setupsession completed)
 find [list of search-terms]       (find setupsession running)
-between [start-date end-date]     (between 2020-01-01 2020-01-15)
+between [start-date end-date]     (between 2020-01-01-0:0:0.0 2020-12-31-23:59:59.9)
 client [client name]              (client AX82017)
 sort [value]                      (sort 1)
 

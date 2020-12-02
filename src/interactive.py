@@ -2,6 +2,7 @@ from QueryParser import QueryParser
 from Types import QuerySyntax as QuerySyntax
 import cmd
 import sys
+from os import path as check_path
 
 
 class Build(cmd.Cmd):
@@ -20,7 +21,11 @@ class Build(cmd.Cmd):
         return QuerySyntax(StartEnd, Find, Between, Client, Sort)
 
     def show_help(self):
-        with open("src/help.txt") as help:
+        path = "help.txt"
+        if not check_path.isfile(path):
+            path = "src/help.txt"
+
+        with open(path) as help:
             for line in help:
                 print(line, end="")
 
@@ -56,8 +61,9 @@ class Build(cmd.Cmd):
         self.between = dates
 
     def do_client(self, arg):
-        print(f'Adding CLIENT to query: {arg}')
-        self.client = arg
+        client = arg.upper()
+        print(f'Adding CLIENT to query: {client}')
+        self.client = client
 
     def do_sort(self, arg):
         print(f'Adding SORT to query: {arg}')

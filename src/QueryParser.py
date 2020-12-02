@@ -9,7 +9,7 @@ class QueryParser:
     """
     def __init__(self):
         self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']  # index of supported operations
-        self.query = None    # base query instance - should be reset before every parse-op
+        self.query = Query()    # base query instance - should be reset before every parse-op
 
     # parsing utils
     def parse_json(self, query):
@@ -38,7 +38,7 @@ class QueryParser:
         Primary entry-point. Process the search-args.
         Supported syntax: {"Find": [list of words], "Between": [startdate, enddate], "Client": clientname}
         """
-        self.query = Query()  # setup/reset base query between parse-operations
+        # self.query = Query()  # TODO must we setup/reset base query between parse-operations ?
         try:
             self.invoke_query(args)
             self.query.ShowResults(1)

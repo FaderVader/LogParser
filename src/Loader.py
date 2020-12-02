@@ -1,13 +1,27 @@
 from StructureBuilder import StructureBuilder 
 from LogLine import LogLine
 from os import listdir
+from os import path as check_path
 
 
 class Loader:
-    def __init__(self, base_path='./testSources/', app_name='GalaxySiteSelector', file_ext='.log'): 
-        self.base_path = base_path  # config - if debug: './testSources/'   if run from shell: '../testSources/'
+    def __init__(self, base_path='../testSources/', app_name='GalaxySiteSelector', file_ext='.log'): 
+        self.base_path = self.get_base_path()  # config - if debug: './testSources/'   if run from shell: '../testSources/'
         self.app_name = app_name
         self.file_ext = file_ext
+
+    def get_base_path(self):
+        path = '../testSources/'
+        if check_path.isdir(path):
+            return path
+        else:
+            return './testSources/'
+        # try:
+        #     with open(path) as f:
+        #         return path
+        # except:
+        #     path = './testSources/'
+        #     return path
 
     def stripFileNames(self, file_list):
         """
