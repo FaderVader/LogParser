@@ -117,7 +117,7 @@ class Query:
         for pointer in self.results:
             actual_line = self.GetLine(pointer)
             bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}#{pointer.payload}')  # store pointer as string for later deconstruct
-             # TODO: we should encapsulate in a method
+            # TODO: we should encapsulate in a method
 
         sorted = bst.inOrder()
         sorted_list = []
