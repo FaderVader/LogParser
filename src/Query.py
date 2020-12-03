@@ -181,6 +181,7 @@ class Query:
             return
 
         for pointer in self.results:
+            print('')  # one line spacer
             if pointer.payload is None:  
                 # standard result-type - one line            
                 self.print_logLine(pointer, format)
@@ -194,7 +195,7 @@ class Query:
                 self.print_logLine(pointer, format)
                 self.print_logLine(second_line, format)
                 print('--')
-            print(f'result count: {len(self.results)}')
+        print(f'result count: {len(self.results)}')
 
     def print_logLine(self, pointer, format=0):
         actual_line = self.GetLine(pointer)

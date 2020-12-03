@@ -9,7 +9,7 @@ class QueryParser:
     """
     def __init__(self):
         self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']  # index of supported operations
-        self.query = Query()    # base query instance - should be reset before every parse-op
+        self.query = Query()    # base query instance - do we really need to reset before every parse-op ?
 
     # parsing utils
     def parse_json(self, query):

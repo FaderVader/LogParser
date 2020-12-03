@@ -16,12 +16,6 @@ class Loader:
             return path
         else:
             return './testSources/'
-        # try:
-        #     with open(path) as f:
-        #         return path
-        # except:
-        #     path = './testSources/'
-        #     return path
 
     def stripFileNames(self, file_list):
         """
