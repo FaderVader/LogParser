@@ -11,7 +11,7 @@ class QueryParser:
         self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']  # index of supported operations
         self.query = Query()    # base query instance - do we really need to reset before every parse-op ?
 
-    # parsing utils
+    # parsing util
     def parse_json(self, query):
         if isinstance(query, str):
             return json.loads(query)
@@ -33,10 +33,24 @@ class QueryParser:
                         method = getattr(QueryParser, function_name)
                         method(self, args)
 
+    def GetClients(self):
+        """
+        Returns all clients, aggregated across all log-files.
+        """
+        clients = self.query.GetClients()
+        return clients
+
     def Parse(self, args):
         """
         Primary entry-point. Process the search-args.
-        Supported syntax: {"Find": [list of words], "Between": [startdate, enddate], "Client": clientname}
+        Supported syntax: 
+        {
+            "StartEnd": [[word list], [word list]], 
+            "Find": [list of words], 
+            "Between": [startdate, enddate], 
+            "Client": clientname,
+            "Sort": (any value)
+        }
         """
         # self.query = Query()  # TODO must we setup/reset base query between parse-operations ?
         try:

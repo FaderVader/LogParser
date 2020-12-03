@@ -25,13 +25,13 @@ class Query:
 
     def buildSearchTrie(self, *args):
         """
-        Build list of matches from search-words. 
+        Build list of matches from search-words.
         Put returned pointers into sub-trie.
         """
         args_as_list = [*args]
         self.search_trie = SearchTrie()
 
-        for arg in args_as_list:            
+        for arg in args_as_list:
             # get pointer to matches for every word
             word = arg.lower()
             matches = self.log_trie.FindWord(word) 
@@ -42,6 +42,13 @@ class Query:
 
     def GetLine(self, pointer):
         return self.all_files[pointer.client][pointer.date][pointer.linenumber]
+
+    def GetClients(self):
+        """
+        Returns all clients across all logfiles.
+        """
+        clients = [*self.all_files]
+        return clients
 
     def MustContainWords(self, *args):
         """
@@ -206,3 +213,10 @@ class Query:
         else:
             time = actual_line.GetTimeStamp()
         print(time, actual_line.GetPayLoad())
+
+
+if __name__ == "__main__":
+    query = Query()
+    query.setup()
+    test = query.GetClients()
+    print(test)

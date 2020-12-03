@@ -25,7 +25,7 @@ class LogTrie:
         def inner(word, node):
             if len(word) == 0:
                 if node.value is None:
-                    node.value = [terminator] 
+                    node.value = [terminator]
                 else:
                     node.value.append(terminator)  # elements are concatenated: multiple hits are expected
                 return
@@ -37,9 +37,9 @@ class LogTrie:
                 return inner(word[1:], node.children[word[0]])
         return inner(word, self.root)
 
-    # format to words
+    # clean, filter and split to words
     def addLine(self, line, terminator):
-        pattern = r'[()\[\]"\.:]'
+        pattern = r'[()\[\]"\.:,]'  # filter out these characters
         cleaned_line = re.sub(pattern, ' ', line.lower())
 
         words = cleaned_line.split()
