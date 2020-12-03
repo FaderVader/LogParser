@@ -5,6 +5,7 @@ class StructureBuilder:
     - for every log-file, build list of lines, then set 2. dict value to list
     """
 
+    # expected naming-format: GalaxySiteSelector-AX82017-20200929.log
     client_name_stripper = lambda name: (name[19:])[:-9]
     file_name_stripper = lambda filename: (filename[-8:])
 
@@ -36,10 +37,16 @@ class StructureBuilder:
 
         for client in clientDict:
             client_list = []
-            for file in filelist:  # TODO refactor: we should pop item from list. File can only be added once
+            found_files = []
+            for file in filelist:
                 if client in file:
+                    found_files.append(file)
                     client_list.append(StructureBuilder.file_name_stripper(file)) 
             clientDict[client] = dict.fromkeys(client_list, [])
+
+            # we remove matched items from list, since a file can only be added once
+            for found_file in found_files:
+                filelist.remove(found_file)  
         return clientDict
 
     @staticmethod

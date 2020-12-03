@@ -21,7 +21,7 @@ class Query:
         trie = PrepareTrie()                       # setup the tries
         self.log_trie = trie.GetLogTrie()          # load log-trie
         self.all_files = trie.GetStructuredLogs()  # get the files in structured format
-        self.search_trie = SearchTrie()
+        self.search_trie = None
 
     def buildSearchTrie(self, *args):
         """
@@ -138,7 +138,7 @@ class Query:
     def StartEnd(self, start_words, end_words):
         """
         Find all intervals between two sets of occurrences.
-        "StartEnd": [[list of words], [list of words]
+        start_words:[list of words], end_words:[list of words]
         """
         IntervalPairs = []
 
@@ -148,8 +148,10 @@ class Query:
         self.MustContainWords(*end_words)
         end_results = self.results.copy()  # avoid by-ref
 
-        # TODO : pairs MUST be from same file (sanity check)
+        # TODO : pairs should be from same date/file (sanity check)
 
+        # For every hit for start-words, find next immediate match for end-words.
+        # Store line-pairs, along with their delta-time.
         for line_start in start_results:
             self.results = start_results.copy()
             actual_line_start = self.GetLine(line_start)
@@ -166,7 +168,8 @@ class Query:
                 pair = IntervalPair(t_delta, line_start, line_end)
                 IntervalPairs.append(pair)
             except: continue  
-
+        
+        # Pack the late line in pair into Terminator's/pointer's payload 
         interval_results = []
         for pair in IntervalPairs:
             t_delta = pair.delta

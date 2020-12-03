@@ -5,11 +5,11 @@ import inspect
 
 class QueryParser:
     """
-    Frontend for queries. 
+    Frontend for queries. Depends on Query.
     """
     def __init__(self):
-        self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']  # index of supported operations
-        self.query = Query()    # base query instance - do we really need to reset before every parse-op ?
+        self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']  # index of supported syntax
+        self.query = Query()    # base query instance
 
     # parsing util
     def parse_json(self, query):
@@ -18,11 +18,16 @@ class QueryParser:
         else:
             return query
 
+    # helper method
     def get_args_from_query(self, query, element):
         arguments = query.__getattribute__(element)
         return arguments
 
+    # use a little reflection to invoke functions
     def invoke_query(self, args):
+        """
+        Acquire delegate and invoke with arguments
+        """
         user_query = self.parse_json(args)
         all_members = inspect.getmembers(QueryParser, inspect.isfunction)
 

@@ -27,7 +27,10 @@ class Build(cmd.Cmd):
         return QuerySyntax(StartEnd, Find, Between, Client, Sort)
 
     def catch(func):
-        def inner(*args, **kwargs):
+        """
+        Error-handler for query-building commands
+        """
+        def inner(*args):  # , **kwargs
             try:
                 return func(*args)
             except:
