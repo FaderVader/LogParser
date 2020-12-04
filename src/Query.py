@@ -4,6 +4,7 @@ from BinarySearchTree import BST
 from PrepareTrie import PrepareTrie
 from Types import Terminator as Terminator
 from Types import IntervalPair as IntervalPair
+from Utils import Utils
 
 
 class Query:
@@ -151,7 +152,7 @@ class Query:
         # TODO : pairs should be from same date/file (sanity check)
 
         # For every hit for start-words, find next immediate match for end-words.
-        # Store line-pairs, along with their delta-time.
+        # Store line-pairs.
         for line_start in start_results:
             self.results = start_results.copy()
             actual_line_start = self.GetLine(line_start)
@@ -162,20 +163,14 @@ class Query:
             self.MustBeAfter(actual_line_start_time)
             try:
                 line_end = self.results[0]  # throws exception if no end-match is found -> then we skip pair
-                actual_line_end = self.GetLine(line_end)
-
-                t_delta = actual_line_end.GetTimeStamp() - actual_line_start.GetTimeStamp()
-                pair = IntervalPair(t_delta, line_start, line_end)
+                pair = IntervalPair(line_start, line_end)
                 IntervalPairs.append(pair)
             except: continue  
         
         # Pack the late line in pair into Terminator's/pointer's payload 
         interval_results = []
         for pair in IntervalPairs:
-            t_delta = pair.delta
-
-            # payload format: $$delta $end-client $end-date $end-linenumber
-            payload = f'$${str(t_delta)}${pair.pointer_B.client}${pair.pointer_B.date}${pair.pointer_B.linenumber}'  # TODO: we should encapsulate in a method
+            payload = Utils.Pointer_ToString(pair.pointer_B)
             term = Terminator(pair.pointer_A.client, pair.pointer_A.date, pair.pointer_A.linenumber, payload)
             interval_results.append(term)
 
@@ -198,16 +193,16 @@ class Query:
 
             else:  
                 # extended resulttype - payload has reference to second line
-                payload_parts = pointer.payload.split('$$')[1].split('$')
-                delta_t = payload_parts[0]
-                second_line = Terminator(payload_parts[1], payload_parts[2], int(payload_parts[3]), None)
-                print(f'delta: {delta_t}')
+                second_line = Utils.Pointer_ToTerminator(pointer.payload)
                 self.print_logLine(pointer, format)
                 self.print_logLine(second_line, format)
                 print('--')
         print(f'result count: {len(self.results)}')
 
     def print_logLine(self, pointer, format=0):
+        """
+        Takes a Terminator as pointer to log-line and prints it.
+        """
         actual_line = self.GetLine(pointer)
         print(f'Client: {pointer.client}, date: {pointer.date}, line: {pointer.linenumber}')
 
