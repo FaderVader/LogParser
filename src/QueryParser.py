@@ -47,20 +47,22 @@ class QueryParser:
 
     def Parse(self, args):
         """
-        Primary entry-point. Process the search-args.
+        Primary entry-point. Process the search-args.\n
         Supported syntax: 
-        {
             "StartEnd": [[word list], [word list]], 
             "Find": [list of words], 
             "Between": [startdate, enddate], 
             "Client": clientname,
             "Sort": (any value)
-        }
         """
         # self.query = Query()  # TODO must we setup/reset base query between parse-operations ?
         try:
             self.invoke_query(args)
             self.query.ShowResults(1)
+        except AttributeError as e:
+            print(f"Program error - Attribute error: {str(e)}")
+        except ValueError as e:
+            print(f"Program error - Value error: {str(e)}")
         except:
             print("No results found!")            
 

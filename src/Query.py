@@ -4,7 +4,7 @@ from BinarySearchTree import BST
 from PrepareTrie import PrepareTrie
 from Types import Terminator as Terminator
 from Types import IntervalPair as IntervalPair
-from Utils import Utils
+from Utils import TermUtil as TermUtil
 
 
 class Query:
@@ -76,7 +76,7 @@ class Query:
         self.MustBeAfter(start_date)
         self.MustBeFore(end_date)
 
-    def MustBeFore(self, date):  # TODO we should sort .results and stop iterating after first match, then slice the list
+    def MustBeFore(self, date): 
         """
         Truncate Query.results to only events before 
         """
@@ -86,11 +86,11 @@ class Query:
         for pointer in self.results:
             actual_line = self.GetLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
-            if (time_stamp <= end_date_epoch):
+            if (time_stamp < end_date_epoch):
                 local_results.append(pointer)
         self.results = local_results
 
-    def MustBeAfter(self, date):  # TODO we should sort .results and stop iterating after first match, then slice the list
+    def MustBeAfter(self, date):  # TODO we could sort .results and stop iterating after first match, then slice the list
         """
         Truncate Query.results to only events after
         """
@@ -100,7 +100,7 @@ class Query:
         for pointer in self.results:
             actual_line = self.GetLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
-            if (time_stamp >= start_date_epoch):
+            if (time_stamp > start_date_epoch):
                 local_results.append(pointer)
         self.results = local_results
 
@@ -151,8 +151,8 @@ class Query:
 
         # TODO : pairs should be from same date/file (sanity check)
 
-        # For every hit for start-words, find next immediate match for end-words.
-        # Store line-pairs.
+        # For every hit of start-words, find next immediate match of end-words.
+        # Then store line-pairs.
         for line_start in start_results:
             self.results = start_results.copy()
             actual_line_start = self.GetLine(line_start)
@@ -170,7 +170,7 @@ class Query:
         # Pack the late line in pair into Terminator's/pointer's payload 
         interval_results = []
         for pair in IntervalPairs:
-            payload = Utils.Pointer_ToString(pair.pointer_B)
+            payload = TermUtil.ToString(pair.pointer_B)
             term = Terminator(pair.pointer_A.client, pair.pointer_A.date, pair.pointer_A.linenumber, payload)
             interval_results.append(term)
 
@@ -181,22 +181,21 @@ class Query:
         Print the content of Query.results.
         Add argument 'format=1' to print time in true date, otherwise epoch.
         """
-
-        if len(self.results) <= 0:  # don't print if there's nothing to show
-            return
-
         for pointer in self.results:
             print('')  # one line spacer
-            if pointer.payload is None:  
+
+            def inner(pointer):
+                if pointer is None: return
+
                 # standard result-type - one line            
                 self.print_logLine(pointer, format)
 
-            else:  
-                # extended resulttype - payload has reference to second line
-                second_line = Utils.Pointer_ToTerminator(pointer.payload)
-                self.print_logLine(pointer, format)
-                self.print_logLine(second_line, format)
-                print('--')
+                if pointer.payload is not None:  
+                    # extended resulttype - payload has reference to linked line
+                    linked_line = TermUtil.ToTerminator(pointer.payload)
+                    self.print_logLine(linked_line, format)
+                    inner(TermUtil.ToTerminator(linked_line))  # any more ?
+            inner(pointer)
         print(f'result count: {len(self.results)}')
 
     def print_logLine(self, pointer, format=0):

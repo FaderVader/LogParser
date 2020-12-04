@@ -1,3 +1,6 @@
+import sys
+
+
 class Node:
     def __init__(self, data, left=None, right=None):
         self.data = data
@@ -8,6 +11,7 @@ class Node:
 class BST:
     def __init__(self):
         self.root = None
+        sys.setrecursionlimit(10**6)  # raises the ceiling - but we can still break it!
 
     # tree building
     def add(self, data):

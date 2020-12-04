@@ -28,9 +28,9 @@ class Build(cmd.Cmd):
 
     def catch(func):
         """
-        Error-handler for query-building commands
+        Error-wrapper for query-building commands
         """
-        def inner(*args):  # , **kwargs
+        def inner(*args):
             try:
                 return func(*args)
             except:
@@ -85,11 +85,10 @@ class Build(cmd.Cmd):
 
     @catch
     def do_find(self, args):
-        print(f'Adding FIND to query: {args}')
         words = args.split()
-
         if len(words) < 1: raise Exception("No search words provided")
         self.find = words
+        print(f'Adding FIND to query: {args}')
 
     @catch
     def do_between(self, args):
@@ -104,8 +103,8 @@ class Build(cmd.Cmd):
 
     @catch
     def do_sort(self, arg):
-        print(f'Adding SORT to query: {arg}')
         self.sort = int(arg)
+        print(f'Adding SORT to query: {arg}')
 
     def do_get_clients(self, arg):
         clients = self.queryParser.GetClients()
