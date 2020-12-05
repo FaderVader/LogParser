@@ -91,7 +91,15 @@ class Query:
             sorted_results = self.SortOnTime()
             is_sorted = True
         else: 
-            sorted_results = self.results            
+            sorted_results = self.results   
+
+        # edge-case: if cut-off date is later than last result
+        # we just keep results intact
+        last_index = len(sorted_results) - 1
+        last_line = sorted_results[last_index]
+        last_line_time = self.GetLine(last_line).GetTimeStamp()
+        if end_date_epoch >= last_line_time:
+            return is_sorted
 
         for index, pointer in enumerate(sorted_results):
             actual_line = self.GetLine(pointer)
