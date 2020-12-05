@@ -11,7 +11,7 @@ class QueryParser:
         self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']  # index of supported syntax
         self.query = Query()    # base query instance
 
-    # parsing util
+    # if query is json-shaped, deserialize 
     def parse_json(self, query):
         if isinstance(query, str):
             return json.loads(query)
@@ -44,6 +44,9 @@ class QueryParser:
         """
         clients = self.query.GetClients()
         return clients
+
+    def ShowStats(self):
+        pass
 
     def Parse(self, args):
         """

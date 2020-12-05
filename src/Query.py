@@ -53,7 +53,7 @@ class Query:
 
     def MustContainWords(self, *args):
         """
-        Set Query.results to contain all matches
+        Set Query.results to contain all matches. Args: 'word', 'word', ...
         """
         self.buildSearchTrie(*args)
 
@@ -69,40 +69,60 @@ class Query:
                 hit_list.append(pointer)
         self.results = hit_list
 
-    def MustBetween(self, start_date, end_date):  # date format: 2020-09-04-18:16:12.1515421
+    def MustBetween(self, start_date, end_date, is_sorted=False):  # date format: 2020-09-04-18:16:12.1515421
         """
-        Truncate Query.results to a time-span
+        Truncate Query.results to a time-span. (start & end not included) \n 
+        Date arg: normal time-string: 2020-12-01-00:00:00.0 \n
+        If we know results are already ordered by date ascending, set flag is_sorted=True
         """
-        self.MustBeAfter(start_date)
-        self.MustBeFore(end_date)
+        is_sorted = self.MustBeAfter(start_date, is_sorted)
+        self.MustBeFore(end_date, is_sorted)
 
-    def MustBeFore(self, date): 
+    def MustBeFore(self, date, is_sorted=False): 
         """
         Truncate Query.results to only events before 
+        Date arg: normal time-string: 2020-12-01-00:00:00.0 \n 
+        If we know the result-set is already sorted, we set is_sorted=True
         """
         end_date_epoch = LogLine.ConvertStringToTime(date)
         local_results = []
 
-        for pointer in self.results:
+        if not is_sorted:
+            sorted_results = self.SortOnTime()
+            is_sorted = True
+        else: 
+            sorted_results = self.results            
+
+        for index, pointer in enumerate(sorted_results):
             actual_line = self.GetLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
-            if (time_stamp < end_date_epoch):
-                local_results.append(pointer)
+            if (time_stamp > end_date_epoch):
+                local_results = sorted_results[:index]  # take rest
+                break
         self.results = local_results
+        return is_sorted
 
-    def MustBeAfter(self, date):  # TODO we could sort .results and stop iterating after first match, then slice the list
+    def MustBeAfter(self, date, is_sorted=False):
         """
-        Truncate Query.results to only events after
+        Truncate Query.results to events later than date arg: normal time-string: 2020-12-01-00:00:00.0
         """
         start_date_epoch = LogLine.ConvertStringToTime(date)
         local_results = []
 
-        for pointer in self.results:
+        if not is_sorted:
+            sorted_results = self.SortOnTime()
+            is_sorted = True
+        else: 
+            sorted_results = self.results   
+
+        for index, pointer in enumerate(sorted_results):
             actual_line = self.GetLine(pointer)
             time_stamp = actual_line.GetTimeStamp()
-            if (time_stamp > start_date_epoch):
-                local_results.append(pointer)
+            if (time_stamp > start_date_epoch):                
+                local_results = sorted_results[index:]  # take rest
+                break
         self.results = local_results
+        return is_sorted
 
     def MustBeFromClient(self, client_name):
         """
@@ -217,3 +237,6 @@ if __name__ == "__main__":
     query.setup()
     test = query.GetClients()
     print(test)
+    query.MustContainWords('setupsession', 'running')
+    query.MustBetween('2020-10-14-17:03:54.500050','2020-10-16-10:22:50.668270')
+    query.ShowResults(1)
