@@ -169,27 +169,36 @@ class Query:
         start_words:[list of words], end_words:[list of words]
         """
         IntervalPairs = []
+        max_interval = 120  # if an interval exceeds this value, we disregard as false 
 
         self.MustContainWords(*start_words)
-        start_results = self.results.copy()  # avoid by-ref 
+        start_results = self.SortOnTime().copy()  # avoid by-ref 
 
         self.MustContainWords(*end_words)
-        end_results = self.results.copy()  # avoid by-ref
+        end_results = self.SortOnTime().copy()  # avoid by-ref 
 
         # For every hit of start-words, find next immediate match of end-words.
         # Then store line-pairs.
         for line_start in start_results:
             self.results = start_results.copy()
             actual_line_start = self.GetLine(line_start)
-            actual_line_start_time = LogLine.ConvertTimestampToString(actual_line_start.GetTimeStamp())
+            actual_line_start_timestamp = actual_line_start.GetTimeStamp()
+            actual_line_start_time = LogLine.ConvertTimestampToString(actual_line_start_timestamp)
 
             self.results = end_results.copy()
             self.MustBeFromClient(line_start.client)
             self.MustBeAfter(actual_line_start_time)
             try:
-                line_end = self.results[0]  # throws exception if no end-match is found -> then we skip pair
+                # throws exception if no end-match is found -> then we skip pair
+                line_end = self.results[0]  
                 
-                if line_start.date != line_end.date:  # pairs should be from same date/file (sanity check)
+                # pairs should be from same date/file (sanity check)
+                if line_start.date != line_end.date:  
+                    continue
+
+                # filter false results
+                delta = LogLine.GetTimeStamp(self.GetLine(line_end)) - actual_line_start_timestamp  
+                if delta > max_interval:
                     continue
 
                 pair = IntervalPair(None, line_start, line_end)
@@ -216,9 +225,6 @@ class Query:
         retrieve sorted, take 5 lowest, 5 highest, average
         show the low/high line-sets
         """
-
-        # We must ensure sortability on delta-values 
-        # - sort-as string fails to handle 10 and 1043 well
         delta_factor = 10**10      
         delta_padding = 20  
         bst = BST()
@@ -229,6 +235,8 @@ class Query:
                 line_end_pointer = TermUtil.ToTerminator(result.payload)
                 line_end = self.GetLine(line_end_pointer)
 
+                # We must ensure sortability on delta-values    
+                # - sort-as string fails to handle 10 and 1043 well
                 t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp()) 
                 t_delta_factored = t_delta * delta_factor
                 t_delta_string = (f'{t_delta_factored}').split('.')[0]
