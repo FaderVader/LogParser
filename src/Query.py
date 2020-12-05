@@ -176,8 +176,6 @@ class Query:
         self.MustContainWords(*end_words)
         end_results = self.results.copy()  # avoid by-ref
 
-        # TODO : pairs should be from same date/file (sanity check)
-
         # For every hit of start-words, find next immediate match of end-words.
         # Then store line-pairs.
         for line_start in start_results:
@@ -190,7 +188,11 @@ class Query:
             self.MustBeAfter(actual_line_start_time)
             try:
                 line_end = self.results[0]  # throws exception if no end-match is found -> then we skip pair
-                pair = IntervalPair(line_start, line_end)
+                
+                if line_start.date != line_end.date:  # pairs should be from same date/file (sanity check)
+                    continue
+
+                pair = IntervalPair(None, line_start, line_end)
                 IntervalPairs.append(pair)
             except: continue  
         
@@ -202,6 +204,63 @@ class Query:
             interval_results.append(term)
 
         self.results = interval_results
+
+    def ShowStats(self):
+        """
+        Iterate over results.
+        if a result has payload, we get embedded pointer
+            - then we calculate time-delta
+
+        stringify all (t_delta, pointer) and load into a BST
+
+        retrieve sorted, take 5 lowest, 5 highest, average
+        show the low/high line-sets
+        """
+
+        # We must ensure sortability on delta-values 
+        # - sort-as string fails to handle 10 and 1043 well
+        delta_factor = 10**10      
+        delta_padding = 20  
+        bst = BST()
+
+        for result in self.results:
+            if result.payload is not None:
+                line_start = self.GetLine(result)
+                line_end_pointer = TermUtil.ToTerminator(result.payload)
+                line_end = self.GetLine(line_end_pointer)
+
+                t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp()) 
+                t_delta_factored = t_delta * delta_factor
+                t_delta_string = (f'{t_delta_factored}').split('.')[0]
+
+                length = len(t_delta_string)
+                t_delta_formatted = ('0' * (delta_padding - length)) + t_delta_string  # pad with leading zero's
+
+                # verify conversion error
+                test = (int(t_delta_formatted)) / delta_factor
+                if (t_delta - test) > 0.00001: 
+                    print(t_delta - test)
+
+                delta_set = f'{t_delta_formatted} ##{TermUtil.ToString(result)}'
+                bst.add(delta_set)
+
+        sorted_delta = bst.inOrder()
+        
+        top_bottom = 10
+        bottom_five = sorted_delta[:top_bottom]  # fastest
+        high_five = sorted_delta[-top_bottom:]   # slowest
+
+        for bottom in bottom_five:
+            delta_t_part = int(bottom.split()[0])
+            pointers_part = bottom.split()[1]
+            delta_t = int(delta_t_part) / delta_factor
+            print(delta_t, pointers_part)
+
+        for top in high_five:
+            delta_t_part = int(top.split()[0])
+            pointers_part = top.split()[1]
+            delta_t = int(delta_t_part) / delta_factor
+            print(delta_t, pointers_part)
 
     def ShowResults(self, format=0):
         """
@@ -242,8 +301,11 @@ class Query:
 if __name__ == "__main__":
     query = Query()
     query.setup()
-    test = query.GetClients()
-    print(test)
-    query.MustContainWords('setupsession', 'running')
-    query.MustBetween('2020-10-14-17:03:54.500050','2020-10-16-10:22:50.668270')
-    query.ShowResults(1)
+    query.StartEnd(['setupsession', 'running'], ['setupsession', 'completed'])
+    query.ShowStats()
+
+    # test = query.GetClients()
+    # print(test)
+    # query.MustContainWords('setupsession', 'running')
+    # query.MustBetween('2020-10-14-17:03:54.500050','2020-10-16-10:22:50.668270')
+    # query.ShowResults(1)

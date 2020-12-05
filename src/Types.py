@@ -11,4 +11,4 @@ Terminator = namedtuple("Terminator", "client date linenumber payload")
 QuerySyntax = namedtuple("QuerySyntax", "StartEnd Find Between Client Sort")
 
 # used in Query.StartEnd
-IntervalPair = namedtuple("IntervalPair", "pointer_A pointer_B")
+IntervalPair = namedtuple("IntervalPair", "delta pointer_A pointer_B")

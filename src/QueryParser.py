@@ -18,7 +18,7 @@ class QueryParser:
         else:
             return query
 
-    # helper method
+    # extract required element from query
     def get_args_from_query(self, query, element):
         arguments = query.__getattribute__(element)
         return arguments
@@ -44,9 +44,6 @@ class QueryParser:
         """
         clients = self.query.GetClients()
         return clients
-
-    def ShowStats(self):
-        pass
 
     def Parse(self, args):
         """
