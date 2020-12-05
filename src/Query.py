@@ -82,7 +82,7 @@ class Query:
         """
         Truncate Query.results to only events before 
         Date arg: normal time-string: 2020-12-01-00:00:00.0 \n 
-        If we know the result-set is already sorted, we set is_sorted=True
+        If we know the result-set is already sorted, set is_sorted=True
         """
         end_date_epoch = LogLine.ConvertStringToTime(date)
         local_results = []
@@ -95,8 +95,7 @@ class Query:
 
         # edge-case: if cut-off date is later than last result
         # we just keep results intact
-        last_index = len(sorted_results) - 1
-        last_line = sorted_results[last_index]
+        last_line = sorted_results[len(sorted_results) - 1]
         last_line_time = self.GetLine(last_line).GetTimeStamp()
         if end_date_epoch >= last_line_time:
             return is_sorted
