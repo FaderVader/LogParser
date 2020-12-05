@@ -9,7 +9,7 @@ class Loader:
     Assumed logfile name-format: {app_name}-{yyyy-mm-dd}{.ext}
     """
     def __init__(self, base_path=None, app_name='GalaxySiteSelector', file_ext='.log'): 
-        self.base_path = self.get_base_path()  
+        self.base_path = self.get_base_path(base_path)  
         self.app_name = app_name
         self.file_ext = file_ext
         self.structure = None
@@ -19,12 +19,17 @@ class Loader:
         files = self.getListOfFiles() 
         self.structure = StructureBuilder.CreateFileStructure(files)
 
-    def get_base_path(self):
+    def get_base_path(self, base_path):
         """
         Verify that folder exists.
         """
-        # config - if debug: './testSources/'   if run from shell: '../testSources/'
-        paths = {'path_a': '../testSources/', 'path_b': './testSources/'}
+        if base_path is not None:  # if base_path was supplied as arg, we check if its valid -
+            found = check_path.isdir(base_path)
+            if not found:
+                raise FileNotFoundError(f"Path {base_path} is not valid")
+
+        # - otherwise, we use one of the defaults
+        paths = {'path_a': '../testSources/', 'path_b': './testSources/'}  # if debug: './testSources/'   if run from shell: '../testSources/'
         if check_path.isdir(paths['path_a']):
             return paths['path_a']
         else:
