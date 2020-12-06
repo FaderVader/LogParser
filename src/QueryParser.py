@@ -8,7 +8,7 @@ class QueryParser:
     Frontend for queries. Depends on Query.
     """
     def __init__(self):
-        self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort']  # index of supported syntax
+        self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort', 'ShowStats']  # index of supported syntax
         self.query = Query()    # base query instance
 
     # if query is json-shaped, deserialize 
@@ -97,3 +97,6 @@ class QueryParser:
         end_words = [*self.get_args_from_query(user_query, 'StartEnd')[1]]
 
         self.query.StartEnd(start_words, end_words)
+    
+    def ShowStats(self, arg):
+        self.query.ShowStats()

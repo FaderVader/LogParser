@@ -11,6 +11,7 @@ class Query:
     """
     Low-level, generic methods for querying trie. Primary trie-building is invoked on instantiating.
     """
+    # setup
     def __init__(self):
         self.log_trie = None      # main trie - contains content of all logs
         self.all_files = None     # all log-files in structured object
@@ -41,6 +42,7 @@ class Query:
             for match in matches:
                 self.search_trie.addPointer(match)
 
+    # query utils
     def GetLine(self, pointer):
         return self.all_files[pointer.client][pointer.date][pointer.linenumber]
 
@@ -51,6 +53,7 @@ class Query:
         clients = [*self.all_files]
         return clients
 
+    # query methods
     def MustContainWords(self, *args):
         """
         Set Query.results to contain all matches. Args: 'word', 'word', ...
@@ -169,7 +172,7 @@ class Query:
         start_words:[list of words], end_words:[list of words]
         """
         IntervalPairs = []
-        max_interval = 120  # if an interval exceeds this value, we disregard as false 
+        max_interval = 120  # (seconds) if an interval exceeds this value, we disregard as false 
 
         self.MustContainWords(*start_words)
         start_results = self.SortOnTime().copy()  # avoid by-ref 
@@ -198,7 +201,7 @@ class Query:
 
                 # filter false results
                 delta = LogLine.GetTimeStamp(self.GetLine(line_end)) - actual_line_start_timestamp  
-                if delta > max_interval:
+                if delta > max_interval or delta <= 0:
                     continue
 
                 pair = IntervalPair(None, line_start, line_end)
@@ -214,6 +217,7 @@ class Query:
 
         self.results = interval_results
 
+    # display results
     def ShowStats(self):
         """
         Iterate over results.
@@ -237,10 +241,9 @@ class Query:
 
                 # We must ensure sortability on delta-values    
                 # - sort-as string fails to handle 10 and 1043 well
-                t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp()) 
+                t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp())  # TODO build wrapper method
                 t_delta_factored = t_delta * delta_factor
                 t_delta_string = (f'{t_delta_factored}').split('.')[0]
-
                 length = len(t_delta_string)
                 t_delta_formatted = ('0' * (delta_padding - length)) + t_delta_string  # pad with leading zero's
 
@@ -259,7 +262,7 @@ class Query:
         high_five = sorted_delta[-top_bottom:]   # slowest
 
         for bottom in bottom_five:
-            delta_t_part = int(bottom.split()[0])
+            delta_t_part = int(bottom.split()[0])  # TODO build un-wrapper method
             pointers_part = bottom.split()[1]
             delta_t = int(delta_t_part) / delta_factor
             print(delta_t, pointers_part)
@@ -270,12 +273,15 @@ class Query:
             delta_t = int(delta_t_part) / delta_factor
             print(delta_t, pointers_part)
 
-    def ShowResults(self, format=0):
+    def ShowResults(self, format=0, result_list=None):
         """
         Print the content of Query.results.
         Add argument 'format=1' to print time in true date, otherwise epoch.
         """
-        for pointer in self.results:
+        if result_list is None:
+            result_list = self.results
+
+        for pointer in result_list:
             print('')  # one line spacer
 
             def inner(pointer):

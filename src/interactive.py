@@ -18,13 +18,14 @@ class Build(cmd.Cmd):
         self.between = None
         self.client = None
         self.sort = None
+        self.showStats = None
         self.queryParser = QueryParser()
 
         # always show help-text on startup
         self.show_help()
 
-    def Syntax(self, StartEnd=None, Find=None, Between=None, Client=None, Sort=None):
-        return QuerySyntax(StartEnd, Find, Between, Client, Sort)
+    def Syntax(self, StartEnd=None, Find=None, Between=None, Client=None, Sort=None, ShowStats=None):
+        return QuerySyntax(StartEnd, Find, Between, Client, Sort, ShowStats)
 
     def catch(func):
         """
@@ -60,6 +61,10 @@ class Build(cmd.Cmd):
                 date = datetime.date.today().strftime("%Y-%m-%d") + "-23:59:59.9"
             parsed_dates.append(date)
         self.between = parsed_dates
+    
+    def build_syntax(self):
+        syntax = self.Syntax(self.startend, self.find, self.between, self.client, self.sort, self.showStats)
+        return syntax
 
     def do_help(self, args):
         self.show_help()
@@ -70,6 +75,7 @@ class Build(cmd.Cmd):
         self.between = None
         self.client = None
         self.sort = None
+        self.showStats = None
 
     def do_exit(self, args):
         print("Goodbye ....")
@@ -106,15 +112,19 @@ class Build(cmd.Cmd):
         self.sort = int(arg)
         print(f'Adding SORT to query: {arg}')
 
+    def do_showStats(self, arg):
+        self.showStats = 1
+        print('Adding SHOWSTATS to query')
+
     def do_get_clients(self, arg):
         clients = self.queryParser.GetClients()
         print(f'Clients: {clients}')
 
     def do_show(self, args):
-        print(self.Syntax(self.startend, self.find, self.between, self.client, self.sort))
+        print(self.build_syntax())
 
     def do_run(self, arg):
-        final_query = self.Syntax(self.startend, self.find, self.between, self.client, self.sort)
+        final_query = self.build_syntax()
         print(final_query)
         self.execute_query(final_query)
 

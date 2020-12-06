@@ -6,6 +6,7 @@ find [list of search-terms]       (find setupsession running)
 between [start-date end-date]     (between 2020-01-01-0:0:0.0 2020-12-31-23:59:59.9)(today today)
 client [client name]              (client AX82017)
 sort [value]                      (sort 1)
+showStats [value]                 (showStats 1)
 get_clients
 
 show:     show current query
