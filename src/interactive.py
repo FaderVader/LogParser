@@ -102,28 +102,29 @@ class Build(cmd.Cmd):
         print(f'Adding BETWEEN to query: {args}')
 
     @catch
-    def do_client(self, arg):
-        client = arg.upper()
+    def do_client(self, args):
+        client = args.upper()
         print(f'Adding CLIENT to query: {client}')
         self.client = client
 
     @catch
-    def do_sort(self, arg):
-        self.sort = int(arg)
-        print(f'Adding SORT to query: {arg}')
+    def do_sort(self, args):
+        self.sort = int(args)
+        print(f'Adding SORT to query: {args}')
 
-    def do_showStats(self, arg):
-        self.showStats = 1
+    @catch
+    def do_stats(self, args):
+        self.showStats = int(args)
         print('Adding SHOWSTATS to query')
 
-    def do_get_clients(self, arg):
+    def do_get_clients(self, args):
         clients = self.queryParser.GetClients()
         print(f'Clients: {clients}')
 
     def do_show(self, args):
         print(self.build_syntax())
 
-    def do_run(self, arg):
+    def do_run(self, args):
         final_query = self.build_syntax()
         print(final_query)
         self.execute_query(final_query)

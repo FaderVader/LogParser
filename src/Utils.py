@@ -3,7 +3,7 @@ from Types import Terminator as Terminator
 
 class TermUtil:
     """
-    Utililites for transforming Termintor tuples to and from strings.
+    Utililites for transforming Terminator tuples to and from strings.
     """
     h = '@'  # header
     s = '$'  # separator
@@ -38,19 +38,22 @@ class TermUtil:
         except:
             raise Exception("Error in TermUtil.ToTerminator")
 
-    def ListToLinked(term_list):
+    @staticmethod
+    def ListToLinkedString(term_list):
         """
-        Take a list of terminators, and build a linked-list.
+        Transforms a list of terminators.\n
+        Returns first Terminator, with remaining terminators converted to embedded payload.
         """
         def inner(term_list):
             if len(term_list) < 2:
                 return Terminator(term_list[0].client, term_list[0].date, term_list[0].linenumber, None)
             return Terminator(term_list[0].client, term_list[0].date, term_list[0].linenumber, TermUtil.ToString(inner(term_list[1:])))
-        return TermUtil.ToString(inner(term_list))
+        return inner(term_list)  # return TermUtil.ToString(inner(term_list)) (completely stringified result)
 
-    def LinkedToList(pointers_string):
+    @staticmethod  # 
+    def StringToListOfPointers(pointers_string):
         """
-        Transform string-object to list of Terminator
+        Transform string-object to list of Terminators, with no payload.
         """
         if not str(pointers_string):
             raise Exception("Argument must be a string")
@@ -64,16 +67,49 @@ class TermUtil:
             pointers_list.append(terminator)
         return pointers_list
 
+
+class EpochTimeUtil:
+    delta_factor = 10**10      
+    delta_padding = 20
+
+    @staticmethod
+    def DeltaTimeWrap(t_delta_epoch):
+        """
+        Convert 0.1853020191 -> 00000000001853020191
+        """
+        t_delta_factored = t_delta_epoch * EpochTimeUtil.delta_factor
+        t_delta_string = (f'{t_delta_factored}').split('.')[0]
+        length = len(t_delta_string)
+        t_delta_formatted = ('0' * (EpochTimeUtil.delta_padding - length)) + t_delta_string  # pad with leading zero's
+        return t_delta_formatted
+
+    @staticmethod
+    def DeltaTimeUnWrap(t_delta_string):
+        """
+        Convert 00000000001853020191 -> 0.1853020191
+        """
+        t_delta_int = int(t_delta_string) / EpochTimeUtil.delta_factor
+        return t_delta_int
+
 if __name__ == "__main__":
-    term = Terminator("Client", "19700101", "888", None)
-    as_string = TermUtil.ToString(term)
-    as_term = TermUtil.ToTerminator(as_string)
-    print(as_string, as_term)
+    # term = Terminator("Client", "19700101", "888", None)
+    # as_string = TermUtil.ToString(term)
+    # as_term = TermUtil.ToTerminator(as_string)
+    # print(as_string, as_term)
 
     terminators = []
     terminators.append(Terminator("client1", "date1", 1, None))
     terminators.append(Terminator("client2", "date2", 2, None))
     terminators.append(Terminator("client3", "date3", 3, None))
-    linked = TermUtil.ListToLinked(terminators)
-    _list = TermUtil.LinkedToList(linked)
-    print(_list)
+    linked = TermUtil.ListToLinkedString(terminators)
+    print(linked)
+
+    payload = '@client1$date1$1$@client2$date2$2$@client3$date3$3$None'
+    converted = TermUtil.StringToListOfPointers(payload)
+    pointer = TermUtil.ListToLinkedString(converted)
+    print(pointer)
+
+    time_epoch = 0.1408741474
+    wrapped = EpochTimeUtil.DeltaTimeWrap(time_epoch)
+    unwrapped = EpochTimeUtil.DeltaTimeUnWrap(wrapped)
+    print(time_epoch, wrapped, unwrapped)

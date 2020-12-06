@@ -31,7 +31,7 @@ class QueryParser:
         user_query = self.parse_json(args)
         all_members = inspect.getmembers(QueryParser, inspect.isfunction)
 
-        for query in self.query_methods:
+        for query in self.query_methods:  # TODO this iteration is not very elegant :-)
             if query in user_query._fields and user_query.__getattribute__(query) is not None:  # _fields: attribute containing the fields of the tuple
                 for function_name, function_obj in all_members:
                     if query == function_name:
@@ -55,7 +55,6 @@ class QueryParser:
             "Client": clientname,
             "Sort": (any value)
         """
-        # self.query = Query()  # TODO must we setup/reset base query between parse-operations ?
         try:
             self.invoke_query(args)
             self.query.ShowResults(1)
@@ -97,6 +96,8 @@ class QueryParser:
         end_words = [*self.get_args_from_query(user_query, 'StartEnd')[1]]
 
         self.query.StartEnd(start_words, end_words)
-    
-    def ShowStats(self, arg):
-        self.query.ShowStats()
+
+    def ShowStats(self, args):
+        user_query = self.parse_json(args)
+        arguments = self.get_args_from_query(user_query, 'ShowStats')
+        self.query.ShowStats(arguments)
