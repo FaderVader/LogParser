@@ -8,10 +8,11 @@ class QueryParser:
     Frontend for queries. Depends on Query.
     """
     def __init__(self):
-        self.query_methods = ['StartEnd', 'Find', 'Between', 'Client', 'Sort', 'ShowStats']  # index of supported syntax
+        # dict of supported syntax
+        self.query_methods = {'STARTEND': 'StartEnd', 'FIND': 'Find', 'BETWEEN': 'Between', 'CLIENT': 'Client', 'SORT': 'Sort', 'SHOWSTATS': 'ShowStats'}  
         self.query = Query()    # base query instance
 
-    # if query is json-shaped, deserialize 
+    # if query is json-shaped string, deserialize 
     def parse_json(self, query):
         if isinstance(query, str):
             return json.loads(query)
@@ -31,12 +32,12 @@ class QueryParser:
         user_query = self.parse_json(args)
         all_members = inspect.getmembers(QueryParser, inspect.isfunction)
 
-        for query in self.query_methods:  
+        for query in self.query_methods:  # MARK
             if query in user_query:  
                 for function_name, function_obj in all_members:
-                    if query == function_name:
+                    if self.query_methods[query] == function_name:
                         method = getattr(QueryParser, function_name)
-                        arguments = self.get_args_from_query(user_query, function_name)
+                        arguments = self.get_args_from_query(user_query, query)
                         method(self, arguments)
 
     def GetClients(self):
@@ -48,13 +49,7 @@ class QueryParser:
 
     def Parse(self, args):
         """
-        Primary entry-point. Process the search-args.\n
-        Supported syntax: 
-            "StartEnd": [[word list], [word list]], 
-            "Find": [list of words], 
-            "Between": [startdate, enddate], 
-            "Client": clientname,
-            "Sort": (any value)
+        Primary entry-point. Process the search-args.
         """
         try:
             self.invoke_query(args)

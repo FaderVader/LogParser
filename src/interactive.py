@@ -1,5 +1,4 @@
 from QueryParser import QueryParser
-from Types import QuerySyntax as QuerySyntax
 import cmd
 import sys
 from os import path as check_path
@@ -20,10 +19,10 @@ class Build(cmd.Cmd):
 
     def init_vars(self):
         """
-        Build a set of variables, based on the methods defined in QueryParser
+        Build a set of variables, based on the look-up dictionary of methods defined in QueryParser
         """
-        var_names = self.queryParser.query_methods
-        for var in var_names:
+        var_names = self.queryParser.query_methods  # MARK
+        for var in var_names:  # get the keys from the dict
             setattr(self, var, None)  # Initialize to None
 
     def catch(func):
@@ -69,19 +68,25 @@ class Build(cmd.Cmd):
         """
         Build a dict-object as argument to be passed to QueryParser.
         """
-        var_names = self.queryParser.query_methods
-
-        query_list = {}
         try:
-            for var in var_names:
-                value = self.__getattribute__(var)
-                if value is not None:
-                    query_list[var] = value
+            # build a dict from all properties with an assigned value
+            query_methods = self.queryParser.query_methods
+            query_list = {var: self.__getattribute__(var) for var in query_methods if self.__getattribute__(var) is not None}
 
         except AttributeError as e:
             raise AttributeError(f'Build.build_query(): failed to parse key/value set: {e}')
 
         return query_list
+
+    def execute_query(self, final_query):
+        try:
+            self.queryParser.Parse(final_query)
+        except AttributeError as e:
+            print(f"Failed to execute query - AttributeError: {e}")
+        except ValueError as e:
+            print(f"Failed to execute query - ValueError: {e}")
+        except:
+            print("Failed to execute query.")
 
     # cli commands - query build
     @catch
@@ -91,7 +96,7 @@ class Build(cmd.Cmd):
             raise ValueError("Must provide minimum 2 words separated by ,")
         part_start = parts[0].split()
         part_end = parts[1].split()
-        setattr(self, 'StartEnd', [part_start, part_end])
+        setattr(self, 'STARTEND', [part_start, part_end])
         print(f'Adding STARTEND to query: {args}')
 
     @catch
@@ -99,29 +104,29 @@ class Build(cmd.Cmd):
         words = args.split()
         if len(words) < 1: 
             raise ValueError("No search words provided")
-        setattr(self, 'Find', words)
+        setattr(self, 'FIND', words)
         print(f'Adding FIND to query: {words}')
 
     @catch
     def do_between(self, args):
         dates = self.parse_dates(args)
-        setattr(self, 'Between', dates)
+        setattr(self, 'BETWEEN', dates)
         print(f'Adding BETWEEN to query: {dates}')
 
     @catch
     def do_client(self, args):
         client = args.upper()
-        setattr(self, 'Client', client)
+        setattr(self, 'CLIENT', client)
         print(f'Adding CLIENT to query: {client}')
 
     @catch
     def do_sort(self, args):
-        setattr(self, 'Sort', int(args))
+        setattr(self, 'SORT', int(args))
         print(f'Adding SORT to query: {args}')
 
     @catch
     def do_stats(self, args):
-        setattr(self, 'ShowStats', int(args))
+        setattr(self, 'SHOWSTATS', int(args))
         print('Adding SHOWSTATS to query')
 
     def do_get_clients(self, args):
@@ -145,16 +150,6 @@ class Build(cmd.Cmd):
     def do_run(self, args):
         final_query = self.build_query()
         self.execute_query(final_query)
-
-    def execute_query(self, final_query):
-        try:
-            self.queryParser.Parse(final_query)
-        except AttributeError as e:
-            print(f"Failed to execute query - AttributeError: {e}")
-        except ValueError as e:
-            print(f"Failed to execute query - ValueError: {e}")
-        except:
-            print("Failed to execute query.")
 
 
 if __name__ == "__main__":
