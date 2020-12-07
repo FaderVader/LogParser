@@ -12,20 +12,19 @@ class Build(cmd.Cmd):
         print("Loading all log-files ....")
         self.prompt = "LogParser> "
 
-        # properties        
-        self.startend = None
-        self.find = None
-        self.between = None
-        self.client = None
-        self.sort = None
-        self.showStats = None
         self.queryParser = QueryParser()
+        self.init_vars()
 
         # always show help-text on startup
         self.show_help()
 
-    def Syntax(self, StartEnd=None, Find=None, Between=None, Client=None, Sort=None, ShowStats=None):
-        return QuerySyntax(StartEnd, Find, Between, Client, Sort, ShowStats)
+    def init_vars(self):
+        """
+        Build a set of variables, based on the methods defined in QueryParser
+        """
+        var_names = self.queryParser.query_methods
+        for var in var_names:
+            setattr(self, var, None)  # Initialize to None
 
     def catch(func):
         """
@@ -34,8 +33,12 @@ class Build(cmd.Cmd):
         def inner(*args):
             try:
                 return func(*args)
+            except AttributeError as e:
+                print(f"AttributeError - failed to parse command: {e}")
+            except ValueError as e:
+                print(f"ValueError - failed to parse command: {e}")
             except:
-                print("Failed to parse command.")
+                print("Failed to parse command")
         return inner
 
     def show_help(self):
@@ -51,7 +54,7 @@ class Build(cmd.Cmd):
         dates = args.split()
 
         if len(dates) < 1:
-            raise Exception("No date arguments provided")
+            raise ValueError("No date arguments provided")
 
         parsed_dates = []
         for i, date in enumerate(dates):
@@ -60,78 +63,96 @@ class Build(cmd.Cmd):
             if date == "today" and i == 1:
                 date = datetime.date.today().strftime("%Y-%m-%d") + "-23:59:59.9"
             parsed_dates.append(date)
-        self.between = parsed_dates
-    
-    def build_syntax(self):
-        syntax = self.Syntax(self.startend, self.find, self.between, self.client, self.sort, self.showStats)
-        return syntax
+        return parsed_dates
 
-    def do_help(self, args):
-        self.show_help()
+    def build_query(self):  # init
+        """
+        Build a dict-object as argument to be passed to QueryParser.
+        """
+        var_names = self.queryParser.query_methods
 
-    def do_reset(self, args):
-        self.startend = None
-        self.find = None
-        self.between = None
-        self.client = None
-        self.sort = None
-        self.showStats = None
+        query_list = {}
+        try:
+            for var in var_names:
+                value = self.__getattribute__(var)
+                if value is not None:
+                    query_list[var] = value
 
-    def do_exit(self, args):
-        print("Goodbye ....")
-        sys.exit()
+        except AttributeError as e:
+            raise AttributeError(f'Build.build_query(): failed to parse key/value set: {e}')
 
+        return query_list
+
+    # cli commands - query build
     @catch
     def do_startend(self, args):
         parts = args.split(',')
+        if len(parts) < 2: 
+            raise ValueError("Must provide minimum 2 words separated by ,")
         part_start = parts[0].split()
         part_end = parts[1].split()
+        setattr(self, 'StartEnd', [part_start, part_end])
         print(f'Adding STARTEND to query: {args}')
-        self.startend = [part_start, part_end]
 
     @catch
     def do_find(self, args):
         words = args.split()
-        if len(words) < 1: raise Exception("No search words provided")
-        self.find = words
-        print(f'Adding FIND to query: {args}')
+        if len(words) < 1: 
+            raise ValueError("No search words provided")
+        setattr(self, 'Find', words)
+        print(f'Adding FIND to query: {words}')
 
     @catch
     def do_between(self, args):
-        self.parse_dates(args)
-        print(f'Adding BETWEEN to query: {args}')
+        dates = self.parse_dates(args)
+        setattr(self, 'Between', dates)
+        print(f'Adding BETWEEN to query: {dates}')
 
     @catch
     def do_client(self, args):
         client = args.upper()
+        setattr(self, 'Client', client)
         print(f'Adding CLIENT to query: {client}')
-        self.client = client
 
     @catch
     def do_sort(self, args):
-        self.sort = int(args)
+        setattr(self, 'Sort', int(args))
         print(f'Adding SORT to query: {args}')
 
     @catch
     def do_stats(self, args):
-        self.showStats = int(args)
+        setattr(self, 'ShowStats', int(args))
         print('Adding SHOWSTATS to query')
 
     def do_get_clients(self, args):
         clients = self.queryParser.GetClients()
         print(f'Clients: {clients}')
 
+    # cli commands - query management 
+    def do_help(self, args):
+        self.show_help()
+
+    def do_reset(self, args):
+        self.init_vars()
+
+    def do_exit(self, args):
+        print("Goodbye ....")
+        sys.exit()
+
     def do_show(self, args):
-        print(self.build_syntax())
+        print(self.build_query())
 
     def do_run(self, args):
-        final_query = self.build_syntax()
-        print(final_query)
+        final_query = self.build_query()
         self.execute_query(final_query)
 
-    def execute_query(self, syntax):
+    def execute_query(self, final_query):
         try:
-            self.queryParser.Parse(syntax)
+            self.queryParser.Parse(final_query)
+        except AttributeError as e:
+            print(f"Failed to execute query - AttributeError: {e}")
+        except ValueError as e:
+            print(f"Failed to execute query - ValueError: {e}")
         except:
             print("Failed to execute query.")
 

@@ -20,7 +20,7 @@ class QueryParser:
 
     # extract required element from query
     def get_args_from_query(self, query, element):
-        arguments = query.__getattribute__(element)
+        arguments = query[element]  
         return arguments
 
     # use a little reflection to invoke functions
@@ -31,12 +31,13 @@ class QueryParser:
         user_query = self.parse_json(args)
         all_members = inspect.getmembers(QueryParser, inspect.isfunction)
 
-        for query in self.query_methods:  # TODO this iteration is not very elegant :-)
-            if query in user_query._fields and user_query.__getattribute__(query) is not None:  # _fields: attribute containing the fields of the tuple
+        for query in self.query_methods:  
+            if query in user_query:  
                 for function_name, function_obj in all_members:
                     if query == function_name:
                         method = getattr(QueryParser, function_name)
-                        method(self, args)
+                        arguments = self.get_args_from_query(user_query, function_name)
+                        method(self, arguments)
 
     def GetClients(self):
         """
@@ -67,37 +68,28 @@ class QueryParser:
 
     # eDSL key-words 
     def Find(self, args):
-        user_query = self.parse_json(args)
-        arguments = [*self.get_args_from_query(user_query, 'Find')]
-        self.query.MustContainWords(*arguments)
+        self.query.MustContainWords(*args)
 
     def Between(self, args):
-        user_query = self.parse_json(args)
-        arguments = [*self.get_args_from_query(user_query, 'Between')]
-        self.query.MustBetween(*arguments)
+        self.query.MustBetween(*args)
 
     def Client(self, args):
-        user_query = self.parse_json(args)
-        arguments = self.get_args_from_query(user_query, 'Client')
-        self.query.MustBeFromClient(arguments)
+        self.query.MustBeFromClient(args)
 
-    def Sort(self, args):
-        sorted_list = self.query.SortOnTime()
-        self.query.results = sorted_list
+    def Sort(self, arg): 
+        if arg is True:
+            sorted_list = self.query.SortOnTime()
+            self.query.results = sorted_list
 
     def StartEnd(self, args):
         """
         Find all intervals between two sets of occurrences.
         "StartEnd": [[list of words], [list of words]
         """
-
-        user_query = self.parse_json(args)
-        start_words = [*self.get_args_from_query(user_query, 'StartEnd')[0]]
-        end_words = [*self.get_args_from_query(user_query, 'StartEnd')[1]]
+        start_words = args[0]
+        end_words = args[1]
 
         self.query.StartEnd(start_words, end_words)
 
     def ShowStats(self, args):
-        user_query = self.parse_json(args)
-        arguments = self.get_args_from_query(user_query, 'ShowStats')
-        self.query.ShowStats(arguments)
+        self.query.ShowStats(args)

@@ -153,6 +153,9 @@ class Query:
         """
         bst = BST()
 
+        if self.results is None:
+            raise ValueError("Query.SortOnTime(): No results to sort.")
+
         for pointer in self.results:
             actual_line = self.GetLine(pointer)
             bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}#{pointer.payload}')  # store pointer as string for later deconstruct
