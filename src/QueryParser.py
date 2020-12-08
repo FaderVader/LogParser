@@ -3,9 +3,10 @@ import json
 import inspect
 
 
+# QueryParser depends on Query.
 class QueryParser:
     """
-    Frontend for queries. Depends on Query.
+    Frontend for queries. 
     """
     def __init__(self):
         # dict of supported syntax
@@ -19,6 +20,7 @@ class QueryParser:
         else:
             return query
 
+    # Extract requested element-value from query.
     def get_args_from_query(self, query, element):
         """
         Extract requested element-value from query.
@@ -49,11 +51,13 @@ class QueryParser:
         clients = self.query.GetClients()
         return clients
 
+    # Primary entry-point. Process the search-args.
     def Parse(self, args):
         """
         Primary entry-point. Process the search-args.
         """
         try:
+            # run the requested method
             self.invoke_query(args)
 
             # if SHOWSTATS has value we dont show std. results
@@ -94,4 +98,4 @@ class QueryParser:
         self.query.StartEnd(start_words, end_words)
 
     def ShowStats(self, args):
-        self.query.ShowStats(args)
+        self.query.ShowStats(1, args)

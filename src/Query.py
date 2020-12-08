@@ -172,7 +172,7 @@ class Query:
 
     def StartEnd(self, start_words, end_words):
         """
-        Find all intervals between two sets of occurrences.
+        Find all delta time-intervals between two sets of occurrences.
         start_words:[list of words], end_words:[list of words]
         """
         IntervalPairs = []
@@ -198,7 +198,7 @@ class Query:
             try:
                 # throws exception if no end-match is found -> then we skip pair
                 line_end = self.results[0]  
-                
+
                 # pairs should be from same date/file (sanity check)
                 if line_start.date != line_end.date:  
                     continue
@@ -211,18 +211,17 @@ class Query:
                 pair = IntervalPair(None, line_start, line_end)
                 IntervalPairs.append(pair)
             except: continue  
-        
-        # Pack the late line in pair into Terminator's/pointer's payload 
-        interval_results = []
-        for pair in IntervalPairs:
-            payload = TermUtil.ToString(pair.pointer_B)
-            term = Terminator(pair.pointer_A.client, pair.pointer_A.date, pair.pointer_A.linenumber, payload)
-            interval_results.append(term)
+
+        # Fold the late line of pair into Terminator's/pointer's payload 
+        interval_results = [Terminator(pair.pointer_A.client, 
+                            pair.pointer_A.date, 
+                            pair.pointer_A.linenumber, 
+                            TermUtil.ToString(pair.pointer_B)) for pair in IntervalPairs]
 
         self.results = interval_results
 
     # display results
-    def ShowStats(self, top_bottom=10):
+    def ShowStats(self, format=1, top_bottom=10):
         """
         Iterate over results.
         if a result has payload, we get embedded pointer
@@ -238,39 +237,27 @@ class Query:
 
         for result in self.results:
             if result.payload is not None:
-                line_start = self.GetLine(result)
-
-                # we get reference to end_line in order to calculate t_delta
-                line_end_pointer = TermUtil.ToTerminator(result.payload)
-                line_end = self.GetLine(line_end_pointer)                                
-                t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp())  
-                t_delta_formatted = EpochTimeUtil.DeltaTimeWrap(t_delta)  # We must ensure sortability on delta-values    
-
-                # result already contains embedded pointer, so we can convert to string and add to bst
-                delta_set = f'{t_delta_formatted}{delta_set_separator}{TermUtil.ToString(result)}'  # TODO build wrapper method
+                delta_set = self.wrap_delta(result, delta_set_separator)
                 bst.add(delta_set)
-
         sorted_delta = bst.inOrder()
 
-        # top_bottom = 10  # TODO this value should be interactive
+        # get the bottom and top-slices
         bottom_slice = sorted_delta[:top_bottom]  # fastest
-        high_slice = sorted_delta[-top_bottom:]   # slowest
+        top_slice = sorted_delta[-top_bottom:]   # slowest
 
         def print_lines(result_slice):
             for item in result_slice:
-                delta_t_part = int(item.split(delta_set_separator)[0])  # TODO build un-wrapper method
-                pointers_part = item.split(delta_set_separator)[1]
-                delta_t = EpochTimeUtil.DeltaTimeUnWrap(delta_t_part)
+                delta_t, pointers_part = self.unwrap_delta(item, delta_set_separator)
                 print(f'delta t: {delta_t}')
 
                 # using a set of converters to build Terminator with embedded content.
                 # ShowResult() can unpack a set of embedded pointers
                 converted = TermUtil.StringToListOfPointers(pointers_part)
                 linked_pointers = [TermUtil.ListToLinkedString(converted)]
-                self.ShowResults(1, linked_pointers)
+                self.ShowResults(format, linked_pointers)
 
         print_lines(bottom_slice)
-        print_lines(high_slice)
+        print_lines(top_slice)
 
     def ShowResults(self, format=0, result_list=None):
         """
@@ -310,12 +297,40 @@ class Query:
             time = actual_line.GetTimeStamp()
         print(time, actual_line.GetPayLoad())
 
+    def wrap_delta(self, pointer_start, delta_set_separator='##'):
+        """
+        Helper for StartEnd: We expect a pointer containing with embedded/linked pointer.\n
+        Calculate the time-delta between log-entries.\n
+        The return value is intended for adding to a BST: {delta_t}{separator}{pointer}
+        """
+        line_start = self.GetLine(pointer_start)
+
+        # we unpack reference to end_line in order to calculate t_delta
+        line_end_pointer = TermUtil.ToTerminator(pointer_start.payload)
+        line_end = self.GetLine(line_end_pointer)                                
+        t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp())  
+        t_delta_formatted = EpochTimeUtil.DeltaTimeWrap(t_delta)  # We must ensure sortability on delta-values    
+
+        # pointer_start already contains embedded pointer, so we just convert to string
+        delta_set = f'{t_delta_formatted}{delta_set_separator}{TermUtil.ToString(pointer_start)}'
+        return delta_set
+
+    def unwrap_delta(self, item, delta_set_separator='##'):
+        """
+        Helper for StartEnd: unpack a string returned from BST.\n
+        Expected arg-format: {delta_t}{separator}{pointer}
+        """
+        delta_t_part = int(item.split(delta_set_separator)[0])  # TODO build un-wrapper method
+        pointers_part = item.split(delta_set_separator)[1]
+        delta_t = EpochTimeUtil.DeltaTimeUnWrap(delta_t_part)
+        return delta_t, pointers_part
+
 
 if __name__ == "__main__":
     query = Query()
     query.setup()
     query.StartEnd(['setupsession', 'running'], ['setupsession', 'completed'])
-    query.ShowStats()
+    query.ShowStats(5)
 
     # test = query.GetClients()
     # print(test)
