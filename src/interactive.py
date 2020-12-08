@@ -21,8 +21,8 @@ class Build(cmd.Cmd):
         """
         Build a set of variables, based on the look-up dictionary of methods defined in QueryParser
         """
-        var_names = self.queryParser.query_methods  # MARK
-        for var in var_names:  # get the keys from the dict
+        var_names = self.queryParser.query_methods  # get the keys from the dict
+        for var in var_names:  
             setattr(self, var, None)  # Initialize to None
 
     def catch(func):
@@ -97,6 +97,7 @@ class Build(cmd.Cmd):
         part_start = parts[0].split()
         part_end = parts[1].split()
         setattr(self, 'STARTEND', [part_start, part_end])
+        setattr(self, 'FIND', None)  # ensure FIND is disabled
         print(f'Adding STARTEND to query: {args}')
 
     @catch
@@ -105,6 +106,8 @@ class Build(cmd.Cmd):
         if len(words) < 1: 
             raise ValueError("No search words provided")
         setattr(self, 'FIND', words)
+        setattr(self, 'STARTEND', None)   # ensure STARTEND is disabled
+        setattr(self, 'SHOWSTATS', None)  # ensure SHOWSTATS is disabled
         print(f'Adding FIND to query: {words}')
 
     @catch
@@ -120,9 +123,13 @@ class Build(cmd.Cmd):
         print(f'Adding CLIENT to query: {client}')
 
     @catch
-    def do_sort(self, args):
-        setattr(self, 'SORT', int(args))
-        print(f'Adding SORT to query: {args}')
+    def do_sort(self, arg):
+        if isinstance(arg, str) and (arg.lower() == 'true'):
+            sort = True
+        else:
+            sort = False
+        setattr(self, 'SORT', sort)
+        print(f'Adding SORT to query: {sort}')
 
     @catch
     def do_stats(self, args):

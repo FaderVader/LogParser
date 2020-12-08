@@ -19,8 +19,10 @@ class QueryParser:
         else:
             return query
 
-    # extract required element from query
     def get_args_from_query(self, query, element):
+        """
+        Extract requested element-value from query.
+        """
         arguments = query[element]  
         return arguments
 
@@ -32,7 +34,7 @@ class QueryParser:
         user_query = self.parse_json(args)
         all_members = inspect.getmembers(QueryParser, inspect.isfunction)
 
-        for query in self.query_methods:  # MARK
+        for query in self.query_methods: 
             if query in user_query:  
                 for function_name, function_obj in all_members:
                     if self.query_methods[query] == function_name:
@@ -53,6 +55,11 @@ class QueryParser:
         """
         try:
             self.invoke_query(args)
+
+            # if SHOWSTATS has value we dont show std. results
+            stats_active = args.get('SHOWSTATS', False)
+            if stats_active: return
+
             self.query.ShowResults(1)
         except AttributeError as e:
             print(f"Program error - Attribute error: {str(e)}")
