@@ -31,6 +31,9 @@ class LogLine():
 
     @staticmethod
     def ConvertStringToTime(date_args):  # date_args = '2020-09-04-18:16:12.1515421' '2020-09-29T08:42:42.0346299+02:00'
+        """
+        Convert a standard date-argument to Epoch timestamp.
+        """
         try:
             timeString = date_args.replace('T', '-')
             timeString = timeString[0:26]  # remove '+02:00' + trim milisec part down
@@ -42,6 +45,9 @@ class LogLine():
 
     @staticmethod
     def ConvertTimestampToString(timestamp):
+        """
+        Convert an epoch timestamp to standard date. 
+        """
         time = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d-%H:%M:%S.%f')  # convert from UNIX time
         return time
 

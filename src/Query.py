@@ -47,13 +47,6 @@ class Query:
     def GetLine(self, pointer):
         return self.all_files[pointer.client][pointer.date][pointer.linenumber]
 
-    def GetClients(self):
-        """
-        Returns all clients across all logfiles.
-        """
-        clients = [*self.all_files]
-        return clients
-
     # query methods
     def MustContainWords(self, *args):
         """
@@ -73,116 +66,20 @@ class Query:
                 hit_list.append(pointer)
         self.results = hit_list
 
-    def MustBetween(self, start_date, end_date, is_sorted=False):  # date format: 2020-09-04-18:16:12.1515421
-        """
-        Truncate Query.results to a time-span. (start & end not included) \n 
-        Date arg: normal time-string: 2020-12-01-00:00:00.0 \n
-        If we know results are already ordered by date ascending, set flag is_sorted=True
-        """
-        is_sorted = self.MustBeAfter(start_date, is_sorted)
-        self.MustBeFore(end_date, is_sorted)
-
-    def MustBeFore(self, date, is_sorted=False): 
-        """
-        Truncate Query.results to only events before 
-        Date arg: normal time-string: 2020-12-01-00:00:00.0 \n 
-        If we know the result-set is already sorted, set is_sorted=True
-        """
-        end_date_epoch = LogLine.ConvertStringToTime(date)
-        local_results = []
-
-        if not is_sorted:
-            sorted_results = self.SortOnTime()
-            is_sorted = True
-        else: 
-            sorted_results = self.results   
-
-        # edge-case: if cut-off date is later than last result
-        # we just keep results intact
-        last_line = sorted_results[len(sorted_results) - 1]
-        last_line_time = self.GetLine(last_line).GetTimeStamp()
-        if end_date_epoch >= last_line_time:
-            return is_sorted
-
-        for index, pointer in enumerate(sorted_results):
-            actual_line = self.GetLine(pointer)
-            time_stamp = actual_line.GetTimeStamp()
-            if (time_stamp > end_date_epoch):
-                local_results = sorted_results[:index]  # take rest
-                break
-        self.results = local_results
-        return is_sorted
-
-    def MustBeAfter(self, date, is_sorted=False):
-        """
-        Truncate Query.results to events later than date arg: normal time-string: 2020-12-01-00:00:00.0
-        """
-        start_date_epoch = LogLine.ConvertStringToTime(date)
-        local_results = []
-
-        if not is_sorted:
-            sorted_results = self.SortOnTime()
-            is_sorted = True
-        else: 
-            sorted_results = self.results   
-
-        for index, pointer in enumerate(sorted_results):
-            actual_line = self.GetLine(pointer)
-            time_stamp = actual_line.GetTimeStamp()
-            if (time_stamp > start_date_epoch):                
-                local_results = sorted_results[index:]  # take rest
-                break
-        self.results = local_results
-        return is_sorted
-
-    def MustBeFromClient(self, client_name):
-        """
-        Truncate Query.results to only be from specified client
-        """
-        local_results = []
-
-        for pointer in self.results:
-            if pointer.client == client_name:
-                local_results.append(pointer)
-        self.results = local_results
-
-    def SortOnTime(self):
-        """
-        For every Query.results, create line incl timestamp.
-        Add complete line to BST and new sorted trie.
-        """
-        bst = BST()
-
-        if self.results is None:
-            raise ValueError("Query.SortOnTime(): No results to sort.")
-
-        for pointer in self.results:
-            actual_line = self.GetLine(pointer)
-            bst.add(f'{actual_line.GetTimeStamp()} ##{pointer.client}#{pointer.date}#{pointer.linenumber}#{pointer.payload}')  # store pointer as string for later deconstruct
-            # TODO: we should encapsulate in a method
-
-        sorted = bst.inOrder()
-        sorted_list = []
-        for line in sorted:
-            pointer_parts = line.split('##')[1].split('#')  # re-creating pointer as Terminator tuple
-            if pointer_parts[3] == "None": pointer_parts[3] = None  # survive the stringiness
-            term = Terminator(pointer_parts[0], pointer_parts[1], int(pointer_parts[2]), pointer_parts[3])
-            sorted_list.append(term)
-        return sorted_list
-
     def StartEnd(self, start_words, end_words):
         """
-        Find all delta time-intervals between two sets of occurrences.
-        start_words:[list of words], end_words:[list of words]
+        Find all delta time-intervals between two sets of occurrences.\n
+        Parameters: start_words: [ list of words ], end_words: [ list of words ]
         """
         IntervalPairs = []
         max_interval = 120  # (seconds) if an interval exceeds this value, we disregard as false 
 
+        # We build two sets of intermediary results
         self.MustContainWords(*start_words)
-        start_results = self.SortOnTime().copy()  # avoid by-ref 
+        start_results = self.SortOnTime().copy() 
 
         self.MustContainWords(*end_words)
-        end_results = self.SortOnTime().copy()  # avoid by-ref 
+        end_results = self.SortOnTime().copy() 
 
         # For every hit of start-words, find next immediate match of end-words.
         # Then store line-pairs.
@@ -220,6 +117,142 @@ class Query:
 
         self.results = interval_results
 
+    def MustBetween(self, start_date, end_date, is_sorted=False):  # date format: 2020-09-04-18:16:12.1515421
+        """
+        Truncate Query.results to a time-span. (start & end not included) \n 
+        Date arg: normal time-string: 2020-12-01-00:00:00.0 \n
+        If we know results are already ordered by date ascending, set flag is_sorted=True
+        """
+        is_sorted = self.MustBeAfter(start_date, is_sorted)
+        self.MustBeFore(end_date, is_sorted)
+
+    def MustBeFore(self, date, is_sorted=False): 
+        """
+        Truncate Query.results to contain only events before date.\n
+        Date arg: normal time-string: 2020-12-01-00:00:00.0 \n 
+        If we know the result-set is already sorted, set is_sorted=True
+        """
+        end_date_epoch = LogLine.ConvertStringToTime(date)
+        local_results = []
+
+        if not is_sorted:
+            sorted_results = self.SortOnTime()
+            is_sorted = True
+        else: 
+            sorted_results = self.results   
+
+        # edge-case: if cut-off date is later than last result
+        # we just keep results intact
+        last_line = sorted_results[len(sorted_results) - 1]
+        last_line_time = self.GetLine(last_line).GetTimeStamp()
+        if end_date_epoch >= last_line_time:
+            return is_sorted
+
+        for index, pointer in enumerate(sorted_results):
+            actual_line = self.GetLine(pointer)
+            time_stamp = actual_line.GetTimeStamp()
+            if (time_stamp > end_date_epoch):
+                local_results = sorted_results[:index]  # take rest
+                break
+        self.results = local_results
+        return is_sorted
+
+    def MustBeAfter(self, date, is_sorted=False):
+        """
+        Truncate Query.results to events later than date arg: \n
+        Normal time-string: 2020-12-01-00:00:00.0
+        """
+        start_date_epoch = LogLine.ConvertStringToTime(date)
+        local_results = []
+
+        if not is_sorted:
+            sorted_results = self.SortOnTime()
+            is_sorted = True
+        else: 
+            sorted_results = self.results   
+
+        for index, pointer in enumerate(sorted_results):
+            actual_line = self.GetLine(pointer)
+            time_stamp = actual_line.GetTimeStamp()
+            if (time_stamp > start_date_epoch):                
+                local_results = sorted_results[index:]  # take rest
+                break
+        self.results = local_results
+        return is_sorted
+
+    def MustBeFromClient(self, client_name):
+        """
+        Truncate Query.results to only be from specified client
+        """
+        local_results = []
+
+        for pointer in self.results:
+            if pointer.client == client_name:
+                local_results.append(pointer)
+        self.results = local_results
+
+    def SortOnTime(self):
+        """
+        Sort current results on time (ascending).
+        Returns a sorted list.
+        """
+        bst = BST()
+
+        if self.results is None:
+            raise ValueError("Query.SortOnTime(): No results to sort.")
+
+        for pointer in self.results:
+            actual_line = self.GetLine(pointer)            
+            line = f'{actual_line.GetTimeStamp()} {TermUtil.ToString(pointer)}'  # add delta time header to pointer 
+            bst.add(line)  
+
+        sorted = bst.inOrder()
+
+        sorted_list = [TermUtil.StringToPointerWithPayload(line.split()[1]) for line in sorted]  # strip the delta time header off
+        return sorted_list
+
+    def GetClients(self):
+        """
+        If we have results, returns all clients across all results, otherwise across all files.
+        """
+        if self.results is None:
+            clients = [*self.all_files]
+            return clients
+
+        found_clients = {pointer.client for pointer in self.results}
+        return list(found_clients)
+
+    # startend helper methods
+    def wrap_delta(self, pointer_start, delta_set_separator='##'):
+        """
+        Helper for StartEnd: We expect a pointer containing with embedded/linked pointer.\n
+        Calculate the time-delta between log-entries.\n
+        Return values: 
+        - delta-t
+        - {delta_t}{separator}{pointer}
+        """
+        line_start = self.GetLine(pointer_start)
+
+        # we unpack reference to end_line in order to calculate t_delta
+        line_end_pointer = TermUtil.ToTerminator(pointer_start.payload)
+        line_end = self.GetLine(line_end_pointer)                                
+        t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp())  
+        t_delta_formatted = EpochTimeUtil.DeltaTimeWrap(t_delta)  # We must ensure sortability on delta-values    
+
+        # pointer_start already contains embedded pointer, so we just convert to string
+        delta_set = f'{t_delta_formatted}{delta_set_separator}{TermUtil.ToString(pointer_start)}'
+        return t_delta, delta_set
+
+    def unwrap_delta(self, item, delta_set_separator='##'):
+        """
+        Helper for StartEnd: unpack a string returned from BST.\n
+        Expected arg-format: {delta_t}{separator}{pointer}
+        """
+        delta_t_part = int(item.split(delta_set_separator)[0])
+        pointers_part = item.split(delta_set_separator)[1]
+        delta_t = EpochTimeUtil.DeltaTimeUnWrap(delta_t_part)
+        return delta_t, pointers_part
+
     # display results
     def ShowStats(self, format=1, top_bottom=10):
         """
@@ -233,30 +266,42 @@ class Query:
         show the low/high line-sets
         """
         delta_set_separator = '##'
+        delta_sum = 0  # aggregate intervals for calculating average
         bst = BST()
+        results_count = len(self.results)
 
         for result in self.results:
             if result.payload is not None:
-                delta_set = self.wrap_delta(result, delta_set_separator)
+                t_delta, delta_set = self.wrap_delta(result, delta_set_separator)
                 bst.add(delta_set)
+                delta_sum += t_delta  
+
         sorted_delta = bst.inOrder()
 
-        # get the bottom and top-slices
+        # if less results than top_bottom, we override
+        top_bottom_limit = results_count // 2
+        if top_bottom_limit < top_bottom:
+            top_bottom = top_bottom_limit
+
         bottom_slice = sorted_delta[:top_bottom]  # fastest
         top_slice = sorted_delta[-top_bottom:]   # slowest
 
         def print_lines(result_slice):
-            for item in result_slice:
+            for index, item in enumerate(result_slice):
                 delta_t, pointers_part = self.unwrap_delta(item, delta_set_separator)
-                print(f'delta t: {delta_t}')
+                print(f'#{index+1} - delta t: {delta_t}')
 
                 # using a set of converters to build Terminator with embedded content.
-                # ShowResult() can unpack a set of embedded pointers
-                converted = TermUtil.StringToListOfPointers(pointers_part)
-                linked_pointers = [TermUtil.ListToLinkedString(converted)]
+                linked_pointers = [TermUtil.StringToPointerWithPayload(pointers_part)]
                 self.ShowResults(format, linked_pointers)
 
+        t_delta_average = delta_sum / results_count  # calculate average interval (sec)
+        print(f'Total results: {results_count} - Average interval: {t_delta_average} seconds.\n')
+
+        print(f'SHORTEST INTERVAL - {top_bottom} items')
         print_lines(bottom_slice)
+
+        print(f'LONGEST INTERVAL - {top_bottom} items')
         print_lines(top_slice)
 
     def ShowResults(self, format=0, result_list=None):
@@ -297,40 +342,12 @@ class Query:
             time = actual_line.GetTimeStamp()
         print(time, actual_line.GetPayLoad())
 
-    def wrap_delta(self, pointer_start, delta_set_separator='##'):
-        """
-        Helper for StartEnd: We expect a pointer containing with embedded/linked pointer.\n
-        Calculate the time-delta between log-entries.\n
-        The return value is intended for adding to a BST: {delta_t}{separator}{pointer}
-        """
-        line_start = self.GetLine(pointer_start)
-
-        # we unpack reference to end_line in order to calculate t_delta
-        line_end_pointer = TermUtil.ToTerminator(pointer_start.payload)
-        line_end = self.GetLine(line_end_pointer)                                
-        t_delta = (line_end.GetTimeStamp() - line_start.GetTimeStamp())  
-        t_delta_formatted = EpochTimeUtil.DeltaTimeWrap(t_delta)  # We must ensure sortability on delta-values    
-
-        # pointer_start already contains embedded pointer, so we just convert to string
-        delta_set = f'{t_delta_formatted}{delta_set_separator}{TermUtil.ToString(pointer_start)}'
-        return delta_set
-
-    def unwrap_delta(self, item, delta_set_separator='##'):
-        """
-        Helper for StartEnd: unpack a string returned from BST.\n
-        Expected arg-format: {delta_t}{separator}{pointer}
-        """
-        delta_t_part = int(item.split(delta_set_separator)[0])  # TODO build un-wrapper method
-        pointers_part = item.split(delta_set_separator)[1]
-        delta_t = EpochTimeUtil.DeltaTimeUnWrap(delta_t_part)
-        return delta_t, pointers_part
-
 
 if __name__ == "__main__":
     query = Query()
     query.setup()
     query.StartEnd(['setupsession', 'running'], ['setupsession', 'completed'])
-    query.ShowStats(5)
+    query.ShowStats(1, 3)
 
     # test = query.GetClients()
     # print(test)

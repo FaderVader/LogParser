@@ -41,7 +41,7 @@ class TermUtil:
     @staticmethod
     def ListToLinkedString(term_list):
         """
-        Transforms a list of terminators.\n
+        Recursively transforms a list of terminators.\n
         Returns first Terminator, with remaining terminators converted to embedded payload.
         """
         def inner(term_list):
@@ -57,15 +57,25 @@ class TermUtil:
         """
         if not str(pointers_string):
             raise Exception("Argument must be a string")
-        
+
         h = TermUtil.h
         pointers_list = []
-        
+
         parts = pointers_string.split(h)[1:]
         for part in parts:
             terminator = TermUtil.ToTerminator(f'@{part}')  # we must re-add header to stripped part
             pointers_list.append(terminator)
         return pointers_list
+
+    @staticmethod
+    def StringToPointerWithPayload(string):
+        """
+        Converts '@client1$date1$1$@client2$date2$2$@client3$date3$3$None' -> \n
+        Terminator(client='client1', date='date1', linenumber=1, payload='@client2$date2$2$@client3$date3$3$None')
+        """
+        converted = TermUtil.StringToListOfPointers(string)
+        pointer = TermUtil.ListToLinkedString(converted)
+        return pointer
 
 
 class EpochTimeUtil:
