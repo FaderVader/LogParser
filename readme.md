@@ -53,7 +53,7 @@ Prints line 123 from file 20200101 of client AX82017
 
 On initialization, every available log-file is fed into the primary search-tool, a word-based trie-structure. For every completed word-boundary in a branch, the terminator-value is set to this pointer.
 
-[trie-tree_terminators.png]
+<img src="https://github.com/FaderVader/LogParser/blob/master/img/trie-tree_terminators.png?raw=true" alt="trie-tree_terminators.png" style="zoom:33%;" />
 
 For every hit to same node, the new pointer is chained after the existing pointer.
 
@@ -65,7 +65,7 @@ Search-trie is used for doing multiword-searches. For every word-hit, the return
 
 The functionality of LogParser is manifested through a number of modules and classes. The application entry-point is `Shell`, which instantiates it's direct dependency, `QueryParser`, which in turn instantiates `Query`, etc. Query is main-class for orchestrating the tries, including the Binary Search Tree which handles the sorting of results.
 
-[LogParser_Architecture.png]
+<img src="https://github.com/FaderVader/LogParser/blob/master/img/LogParser_Architecture_medium.png?raw=true" alt="LogParser_Architecture.png" style="zoom:33%;" />
 
 
 
