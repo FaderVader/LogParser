@@ -39,7 +39,7 @@ class Query:
             word = arg.lower()
             matches = self.log_trie.FindWord(word) 
 
-            # build trie of pointers, terminator indicates number of hits
+            # build trie of pointers - terminator accumulates hit-count
             for match in matches:
                 self.search_trie.AddPointer(match)
 

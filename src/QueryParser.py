@@ -76,7 +76,7 @@ class QueryParser:
             return  # .. so we dont show std. results
 
         self.query.ShowResults(1)
-        print(f'\nResult count: {self.query.results}')
+        print(f'\nResult count: {len(self.query.results)}')
 
     # eDSL key-words 
     def Find(self, args):
