@@ -36,7 +36,7 @@ The application is accessed via a command line interface, used for building quer
 All loaded log-files are contained in a single datastructure, consisting of nested dictionarys and lists. \
 The filename of the logs are indicative of this structure:
 
-GalaxySiteSelector-AX82017-20201001.log    (appname-client-date.extension)
+*GalaxySiteSelector-AX82017-20201001.log*    (appname-client-date.extension)
 
 **{ client { logfile [ (timestamp, payload) ] } }** \
 
@@ -91,7 +91,6 @@ From the prompt, you add the query-components that you need:
 
 `run`		    Execute the active query \
 `show`		  Display the currently active query \
-`reset` 	   Reset all parameters \
 `reset` 	   Reset all parameters \
 `help`		  Display help-hints \ 
 `exit`		  Exit the application 
