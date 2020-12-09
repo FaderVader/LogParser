@@ -73,6 +73,30 @@ The functionality of LogParser is manifested through a number of modules and cla
 
 LogParser does not rely on OS-specific libraries, and can be executed on *nix/windows system, by cloning the repository to your local machine, opening a terminal to the directory and executing python with `shell.py` as argument.
 
+**How to use**
+
+When the application is started, and all logs are loaded (currently from /testSources), the shell-prompt shows LogParser>
+
+From the prompt, you add the components that you need:
+
+`find daletservice running` will add the words daletservice, running to the list of criteria for a positive match.
+
+`client ax82017` will limit results to only be from client AX82017s
+
+`startend SendEvent DaletService Waiting, SendEvent DaletService Success` will search for a pattern where a line contains the first set of words, and a later line must match the second set of words.
+
+`stats 3` will instruct the application to show results as a bottom/top 3, measured by the interval/delta time between first set and second set of startend matches. It will also display the average across all hits.
+
+`get_clients` will either display all clients in current set og log-files, or, if a search has been run, the clients in current result-set.
+
+`run`			Execute the active query
+
+`show`		  Display the currently active query
+
+`reset` 	   Reset all parameters
+
+`exit`		  Exit the application
+
 
 
 ### Next Step ###
