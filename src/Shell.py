@@ -5,7 +5,10 @@ from os import path as check_path
 import datetime
 
 
-class Build(cmd.Cmd):
+class Shell(cmd.Cmd):
+    """
+    Main entry point for LogParser. Starts the interactive query-shell.
+    """
     def __init__(self):
         super().__init__()       
         print("Loading all log-files ....")
@@ -160,5 +163,5 @@ class Build(cmd.Cmd):
 
 
 if __name__ == "__main__":
-    build = Build()
-    build.cmdloop()
+    shell = Shell()
+    shell.cmdloop()

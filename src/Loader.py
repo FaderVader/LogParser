@@ -1,5 +1,5 @@
 from StructureBuilder import StructureBuilder 
-from LogLine import LogLine
+from Types import LogLine
 from os import listdir
 from os import path as check_path
 
@@ -71,7 +71,7 @@ class Loader:
 
     def GetStructuredLogs(self): 
         """
-        Using pre-build structure-scaffold, load all logs into structure [client][file]
+        Using pre-build structure-scaffolding, we load all logs into structure [client][file]
         """
         file_structure = self.structure
         base_path = self.base_path

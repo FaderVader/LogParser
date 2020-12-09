@@ -1,5 +1,5 @@
 from Tries import SearchTrie
-from LogLine import LogLine
+from Types import LogLine
 from BinarySearchTree import BST
 from PrepareTrie import PrepareTrie
 from Types import Terminator as Terminator
@@ -41,7 +41,7 @@ class Query:
 
             # build trie of pointers, terminator indicates number of hits
             for match in matches:
-                self.search_trie.addPointer(match)
+                self.search_trie.AddPointer(match)
 
     # query utils
     def GetLine(self, pointer):
@@ -61,7 +61,7 @@ class Query:
         # to satisfy criteria, a hit must contain at least all search-terms
         hit_list = []
         for pointer in log_pointers:
-            hits = self.search_trie.findPointer(pointer)
+            hits = self.search_trie.FindPointer(pointer)
             if hits >= len(args):
                 hit_list.append(pointer)
         self.results = hit_list
@@ -222,10 +222,10 @@ class Query:
         found_clients = {pointer.client for pointer in self.results}
         return list(found_clients)
 
-    # startend helper methods
+    # StartEnd helper methods
     def wrap_delta(self, pointer_start, delta_set_separator='##'):
         """
-        Helper for StartEnd: We expect a pointer containing with embedded/linked pointer.\n
+        Helper for StartEnd: We expect a pointer containing embedded/linked pointer.\n
         Calculate the time-delta between log-entries.\n
         Return values: 
         - delta-t
@@ -296,13 +296,15 @@ class Query:
                 self.ShowResults(format, linked_pointers)
 
         t_delta_average = delta_sum / results_count  # calculate average interval (sec)
-        print(f'Total results: {results_count} - Average interval: {t_delta_average} seconds.\n')
+        print(f'\nTotal results: {results_count} - Average interval: {t_delta_average} seconds.\n')
 
         print(f'SHORTEST INTERVAL - {top_bottom} items')
         print_lines(bottom_slice)
 
         print(f'LONGEST INTERVAL - {top_bottom} items')
         print_lines(top_slice)
+
+        print(f'\nTotal results: {results_count} - Average interval: {t_delta_average} seconds.\n')
 
     def ShowResults(self, format=0, result_list=None):
         """

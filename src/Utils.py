@@ -79,8 +79,11 @@ class TermUtil:
 
 
 class EpochTimeUtil:
-    delta_factor = 10**10      
-    delta_padding = 20
+    """
+    Utilities for wrapping/unwrapping time intervals expressed in epoch-format.
+    """
+    delta_factor = 10**10  # multiply time-data by factor      
+    delta_padding = 20     # defines format of time-data for uniform sorting-behavior
 
     @staticmethod
     def DeltaTimeWrap(t_delta_epoch):
@@ -88,7 +91,7 @@ class EpochTimeUtil:
         Convert 0.1853020191 -> 00000000001853020191
         """
         t_delta_factored = t_delta_epoch * EpochTimeUtil.delta_factor
-        t_delta_string = (f'{t_delta_factored}').split('.')[0]
+        t_delta_string = (f'{t_delta_factored}').split('.')[0]  # ditch the dot
         length = len(t_delta_string)
         t_delta_formatted = ('0' * (EpochTimeUtil.delta_padding - length)) + t_delta_string  # pad with leading zero's
         return t_delta_formatted

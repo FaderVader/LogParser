@@ -48,7 +48,7 @@ class LogTrie:
 
     def AddLog(self, logFile, terminator=Terminator('*', '*', '*', None)):
         """
-        Takes a log-file as argument and split into lines.
+        Takes a log-file as argument and split into lines.\n
         The terminator-items should be: [client][filedate]
         - Linenumber identifier will be added during line-by-line parsing.
         """
@@ -74,8 +74,8 @@ class LogTrie:
 
 class SearchTrie:
     """
-    Container for all pointers - is used for counting occurrences of search-phrase within a pointer.
-    We need this for identifying multi-word hits on a line
+    Container for all pointers - is used for counting occurrences of search-phrase within a pointer.\n
+    We use SearchTrie for counting multi-word hits on a line.
     """
     def __init__(self):
         self.root = Node()
@@ -84,15 +84,15 @@ class SearchTrie:
     def pointer_as_string(self, pointer):
         return f'{pointer.client}{self._sep}{pointer.date}{self._sep}{pointer.linenumber}'
 
-    def addPointer(self, pointer):
+    def AddPointer(self, pointer):
         pointer_as_string = self.pointer_as_string(pointer)
 
         def inner(pointer, node):
             if len(pointer) == 0:
                 if node.value is None:
-                    node.value = 1  # occured once
+                    node.value = 1  # first occurence
                 else:
-                    node.value = node.value + 1  # inc up on every hit
+                    node.value = node.value + 1  # increment on every following hit
                 return
             elif pointer[0] not in node.children:
                 newNode = Node(pointer[0])
@@ -102,7 +102,10 @@ class SearchTrie:
                 return inner(pointer[1:], node.children[pointer[0]])
         return inner(pointer_as_string, self.root)
 
-    def findPointer(self, pointer):
+    def FindPointer(self, pointer):
+        """
+        Returns the number of hits accumulated for the specified pointer-parameter.
+        """
         currentPointer = self.pointer_as_string(pointer)
         currentNode = self.root
 
@@ -112,4 +115,4 @@ class SearchTrie:
                 currentPointer = currentPointer[1:]
             else:
                 return None
-        return currentNode.value
+        return currentNode.value  

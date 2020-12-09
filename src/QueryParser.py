@@ -46,7 +46,8 @@ class QueryParser:
 
     def GetClients(self):
         """
-        Returns all clients, aggregated across all log-files.
+        Returns all clients, aggregated across all results, \n
+        or log-files, if no results exists yet.
         """
         clients = self.query.GetClients()
         return clients
@@ -56,21 +57,26 @@ class QueryParser:
         """
         Primary entry-point. Process the search-args.
         """
-        try:
-            # run the requested method
-            self.invoke_query(args)
+        try:            
+            self.invoke_query(args)  # run the requested method
+            self.Show(args)          # handle display of results
 
-            # if SHOWSTATS has value we dont show std. results
-            stats_active = args.get('SHOWSTATS', False)
-            if stats_active: return
-
-            self.query.ShowResults(1)
         except AttributeError as e:
             print(f"Program error - Attribute error: {str(e)}")
         except ValueError as e:
             print(f"Program error - Value error: {str(e)}")
         except:
             print("No results found!")            
+
+    def Show(self, args):
+
+        # if SHOWSTATS has value, results are already printed ..
+        stats_active = args.get('SHOWSTATS', False)
+        if stats_active: 
+            return  # .. so we dont show std. results
+
+        self.query.ShowResults(1)
+        print(f'\nResult count: {self.query.results}')
 
     # eDSL key-words 
     def Find(self, args):
