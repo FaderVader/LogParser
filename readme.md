@@ -29,6 +29,8 @@ Examples of useful output from LogParser:
 
 The application is accessed via a command line interface, used for building queries. At startup, all log-files are loaded and a brief help-screen outlines available commands. When a query is executed, the application will query the data-structure, and present the results in the shell as printed lines.
 
+
+
 ### Application Structure ###
 
 **Internal data representation**
@@ -36,7 +38,7 @@ The application is accessed via a command line interface, used for building quer
 All loaded log-files are contained in a single datastructure, consisting of nested dictionarys and lists. \
 The filename of the logs are indicative of this structure:
 
-*GalaxySiteSelector-AX82017-20201001.log*    (appname-client-date.extension)
+*GalaxySiteSelector-AX82017-20201001.log*              (appname-client-date.extension)
 
 **{ client { logfile [ (timestamp, payload) ] } }** \
 
@@ -83,17 +85,43 @@ From the prompt, you add the query-components that you need:
 
 `client ax82017` will limit results to be only from client AX82017.
 
-`startend SendEvent DaletService Waiting, SendEvent DaletService Success` will search for a pattern where a line contains the first set of words, and a later line must match the second set of words.
+`startend SendEvent DaletService Waiting, SendEvent DaletService Success` will search for a pattern where a line contains the first set of words, and a later line must match the second set of words. `startend` and `find` are mutually exclusive, so defining one will remove the other from the active query.
+
+`sort true` will ensure all results are returned sorted ascending according to time.
 
 `stats 3` will instruct the application to show results as a bottom/top 3, measured by the interval/delta time between first set and second set of startend matches. It will also display the average across all hits.
 
-`get_clients` will either display all clients in current set og log-files, or, if a search has been run, the clients in current result-set.
+`get_clients` will either display all clients in current set of log-files, or, if a search has been run, the clients in current result-set.
 
 `run`		    Execute the active query \
 `show`		  Display the currently active query \
 `reset` 	   Reset all parameters \
 `help`		  Display help-hints \
 `exit`		  Exit the application 
+
+
+
+## Technology ##
+
+**Trie**
+
+2 discreet tries are used in LogParser. Trie/LogTrie contains pointers to every occurence of any word found in any log-file. Trie/SearchTrie is used for keeping track of word-hits when searching for multiple words. 
+
+**LogTrie** uses Terminators for word-boundary demarcation. A Terminator defines a reference to the originating client, the date of the logfile, and the line where the match was found. The terminator is serialized, and multiple hits are concatenated.
+
+**SearchTrie** uses same methodology, only the terminators are integers.
+
+
+
+**Binary Search Tree**
+
+The BST is currently only used for sorting the results according to time. We use the In Order traversal of tree-nodes to acquire the sorted set.
+
+
+
+**eDSL**
+
+`Shell` invokes `QueryParser` via JSON data-sets. The JSON is built by `Shell` when the user request to run a search. The `Shell` uses a set of commands and associated arguments to assemble the query.
 
 
 
