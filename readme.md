@@ -89,12 +89,12 @@ From the prompt, you add the query-components that you need:
 
 `get_clients` will either display all clients in current set og log-files, or, if a search has been run, the clients in current result-set.
 
-`run`		    Execute the active query
-`show`		  Display the currently active query
-`reset` 	   Reset all parameters
-`reset` 	   Reset all parameters
-`help`		  Display help-hints
-`exit`		  Exit the application
+`run`		    Execute the active query \
+`show`		  Display the currently active query \
+`reset` 	   Reset all parameters \
+`reset` 	   Reset all parameters \
+`help`		  Display help-hints \ 
+`exit`		  Exit the application 
 
 
 
