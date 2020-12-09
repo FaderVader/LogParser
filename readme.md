@@ -92,7 +92,7 @@ From the prompt, you add the query-components that you need:
 `run`		    Execute the active query \
 `show`		  Display the currently active query \
 `reset` 	   Reset all parameters \
-`help`		  Display help-hints \ 
+`help`		  Display help-hints \
 `exit`		  Exit the application 
 
 
