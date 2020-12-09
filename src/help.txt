@@ -12,4 +12,5 @@ get_clients
 show:     show current query
 run:      execute current query
 reset:    reset all parameters
+help:     show this help-text
 exit:     stop LogParser
