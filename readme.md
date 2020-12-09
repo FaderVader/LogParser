@@ -46,7 +46,7 @@ The filename of the logs are indicative of this structure:
 `file = {'20200101': [], '20200102': [], '20200103': []}`\
 `lines = [(10, 'logline 1'), (20, 'logline 2'), (30, 'logline 2')]`  # (epoch timestamp, payload) 
 
-**\# retrieve** \
+**retrieve** 
 `print(all_files['AX82017']['20201001'][123]) ` 
 
 Prints line 123 from file 20200101 of client AX82017 
@@ -127,7 +127,19 @@ The BST is currently only used for sorting the results according to time. We use
 
 ### Next Step ###
 
+**Log Acquisition**
+
 In the current implementation, LogParser relies on it's data-sources being present locally. The capability to acquire the log-files directly from the pool of application-hosts (clients) is an obvious next step. The target-application can be queried via a REST interface, so acquisition over REST is simple.
+
+**Query refinements**
+
+Additional query-tooling to refine the queries, and better result-interpretations.
+
+**Shortcut to Logfile**
+
+When an interesting logfile has been identified, we want to open it directly from LogParser.
+
+
 
 
 

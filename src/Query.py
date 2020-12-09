@@ -34,14 +34,12 @@ class Query:
         args_as_list = [*args]
         self.search_trie = SearchTrie()
 
-        for arg in args_as_list:
-            # get pointer to matches for every word
-            word = arg.lower()
-            matches = self.log_trie.FindWord(word) 
+        for arg in args_as_list:            
+            word = arg.lower()  # all trie words are lowercased
+            matches = self.log_trie.FindWord(word) # get pointer to matches for every word
 
-            # build trie of pointers - terminator accumulates hit-count
-            for match in matches:
-                self.search_trie.AddPointer(match)
+            # build search-trie of pointers - terminator accumulates hit-count
+            [self.search_trie.AddPointer(match) for match in matches]
 
     # query utils
     def GetLine(self, pointer):
@@ -59,12 +57,10 @@ class Query:
         log_pointers = self.log_trie.FindWord(searchTerm)
 
         # to satisfy criteria, a hit must contain at least all search-terms
-        hit_list = []
-        for pointer in log_pointers:
-            hits = self.search_trie.FindPointer(pointer)
-            if hits >= len(args):
-                hit_list.append(pointer)
-        self.results = hit_list
+        len_args = len(args)
+        hit_set = {pointer for pointer in log_pointers if self.search_trie.FindPointer(pointer) >= len_args}
+
+        self.results = list(hit_set)
 
     def StartEnd(self, start_words, end_words):
         """
@@ -91,7 +87,7 @@ class Query:
 
             self.results = end_results.copy()
             self.MustBeFromClient(line_start.client)
-            self.MustBeAfter(actual_line_start_time)
+            self.MustBeAfter(actual_line_start_time, True)
             try:
                 # throws exception if no end-match is found -> then we skip pair
                 line_end = self.results[0]  
@@ -184,11 +180,7 @@ class Query:
         """
         Truncate Query.results to only be from specified client
         """
-        local_results = []
-
-        for pointer in self.results:
-            if pointer.client == client_name:
-                local_results.append(pointer)
+        local_results = [pointer for pointer in self.results if pointer.client == client_name]
         self.results = local_results
 
     def SortOnTime(self):
