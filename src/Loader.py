@@ -29,7 +29,7 @@ class Loader:
                 raise FileNotFoundError(f"Path {base_path} is not valid")
 
         # - otherwise, we use one of the defaults
-        paths = {'path_a': '../testSources/', 'path_b': './testSources/'}  # if debug: './testSources/'   if run from shell: '../testSources/'
+        paths = {'path_a': '../logs/', 'path_b': './logs/'}  # if debug: './logs/'   if run from shell: '../logs/'
         if check_path.isdir(paths['path_a']):
             return paths['path_a']
         else:

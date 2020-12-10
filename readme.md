@@ -77,7 +77,7 @@ LogParser does not rely on OS-specific libraries, and can be executed on *nix/wi
 
 **How to use**
 
-When the application is started, and all logs are loaded (currently from /testSources), the shell-prompt shows `LogParser>`
+When the application is started, and all logs are loaded (currently from /logs), the shell-prompt shows `LogParser>`
 
 From the prompt, you add the query-components that you need:
 

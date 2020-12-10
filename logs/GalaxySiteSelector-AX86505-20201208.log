@@ -1,0 +1,6 @@
+2020-12-08T09:48:51.5634949+01:00 [INF] "GalaxySiteSelector" - service version: "0.9.5.5", library version: "0.9.5.9" - machinename: "AX86505" (SiteSelector.Program) (b27fd4b2)
+2020-12-08T09:48:52.1798844+01:00 [INF] User profile is available. Using '"C:\WINDOWS\system32\config\systemprofile\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest. (Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager) (7ac5e29c)
+2020-12-08T09:48:52.2252493+01:00 [INF] Creating key {bc94204c-b570-47a4-9a53-dd2841e27054} with creation date 2020-12-08 08:48:52Z, activation date 2020-12-08 08:48:52Z, and expiration date 2021-03-08 08:48:52Z. (Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager) (77afce94)
+2020-12-08T09:48:52.2933545+01:00 [INF] Writing data to file '"C:\WINDOWS\system32\config\systemprofile\AppData\Local\ASP.NET\DataProtection-Keys\key-bc94204c-b570-47a4-9a53-dd2841e27054.xml"'. (Microsoft.AspNetCore.DataProtection.Repositories.FileSystemXmlRepository) (da22a8b1)
+2020-12-08T09:48:53.0747775+01:00 [INF] Now listening on: "https://[::]:5055" (Microsoft.Hosting.Lifetime) (d826f4b8)
+2020-12-08T09:48:53.0750201+01:00 [INF] Application started. Hosting environment: "Production"; Content root path: "C:\ProgramData\GalaxySiteSelector" (Microsoft.Hosting.Lifetime) (9029d6f8)
