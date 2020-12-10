@@ -53,7 +53,7 @@ class Shell(cmd.Cmd):
                 print(line, end="")
 
     def parse_dates(self, args):
-        dates = args.split()
+        dates = args.lower().split()
 
         if len(dates) < 1:
             raise ValueError("No date arguments provided")
@@ -155,7 +155,9 @@ class Shell(cmd.Cmd):
         sys.exit()
 
     def do_show(self, args):
-        print(self.build_query())
+        current_query = self.build_query()
+        [print(f'{key}: {value}', end=', ') for key, value in current_query.items()]
+        print('')
 
     def do_run(self, args):
         final_query = self.build_query()

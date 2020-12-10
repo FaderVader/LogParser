@@ -105,7 +105,7 @@ From the prompt, you add the query-components that you need:
 
 **Trie**
 
-2 discreet tries are used in LogParser. Trie/LogTrie contains pointers to every occurence of any word found in any log-file. Trie/SearchTrie is used for keeping track of word-hits when searching for multiple words. 
+2 discreet tries are used in LogParser. Tries/LogTrie contains pointers to every occurence of any word found in any log-file. Tries/SearchTrie is used for keeping track of word-hits when searching for multiple words. 
 
 **LogTrie** uses Terminators for word-boundary demarcation. A Terminator defines a reference to the originating client, the date of the logfile, and the line where the match was found. The terminator is serialized, and multiple hits are concatenated.
 
@@ -121,7 +121,7 @@ The BST is currently only used for sorting the results according to time. We use
 
 **eDSL**
 
-`Shell` invokes `QueryParser` via JSON data-sets. The JSON is built by `Shell` when the user request to run a search. The `Shell` uses a set of commands and associated arguments to assemble the query.
+`Shell` invokes `QueryParser` via dictionary data-sets. The dictionary argument is built by `Shell` when the user request to run a search. The `Shell` uses a set of commands and associated arguments to assemble the query.
 
 
 
