@@ -201,3 +201,7 @@
 2020-12-10T17:21:50.2182386+01:00 [INF] Request starting HTTP/2 GET https://AX76707:5055/api/getlogs/file?filename=GalaxySiteSelector-AX76707-20201210.log   (Microsoft.AspNetCore.Hosting.Diagnostics) (ca22a1cb)
 2020-12-10T17:21:50.2187334+01:00 [INF] Executing endpoint '"SiteSelector.Controllers.GetLogsController.GetLogFile (SiteSelector)"' (Microsoft.AspNetCore.Routing.EndpointMiddleware) (500cc934)
 2020-12-10T17:21:50.2191994+01:00 [INF] Route matched with "{action = \"GetLogFile\", controller = \"GetLogs\", page = \"\"}". Executing controller action with signature "System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetLogFile(System.String)" on controller "SiteSelector.Controllers.GetLogsController" ("SiteSelector"). (Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker) (122b2fdf)
+2020-12-10T17:21:50.2264682+01:00 [INF] Executing ObjectResult, writing value of type '"System.String"'. (Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor) (8a1b66c8)
+2020-12-10T17:21:50.2282087+01:00 [INF] Executed action "SiteSelector.Controllers.GetLogsController.GetLogFile (SiteSelector)" in 8.7065ms (Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker) (afa2e885)
+2020-12-10T17:21:50.2284149+01:00 [INF] Executed endpoint '"SiteSelector.Controllers.GetLogsController.GetLogFile (SiteSelector)"' (Microsoft.AspNetCore.Routing.EndpointMiddleware) (99874f2b)
+2020-12-10T17:21:50.2287985+01:00 [INF] Request finished in 10.5285ms 200 text/plain; charset=utf-8 (Microsoft.AspNetCore.Hosting.Diagnostics) (791a596a)
