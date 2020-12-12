@@ -131,7 +131,9 @@ Test relies on the package **pytest**, so ensure this is installed. From project
 
 
 
-### Next Step ###
+### Next Steps ###
+
+The application is currently only a working prototype. When maturing to a releasable state, the following items are among the features which could be considered for implementation.
 
 **Log Acquisition**
 
