@@ -1,4 +1,4 @@
-from ..LogLine import LogLine
+from ..Types import LogLine
 
 
 def test_LogLine_Should_Convert_TrueDate_To_TimeStamp():
@@ -7,7 +7,7 @@ def test_LogLine_Should_Convert_TrueDate_To_TimeStamp():
     expected_result = "1601361762.034629"
 
     # Act
-    date_as_epoch = LogLine.parseStringToTime(date_as_string)
+    date_as_epoch = LogLine.ConvertStringToTime(date_as_string)
 
     # Assert
     assert str(date_as_epoch) == expected_result
