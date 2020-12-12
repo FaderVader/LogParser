@@ -1,4 +1,4 @@
-from ..Types import LogLine
+from Types import LogLine
 
 
 def test_LogLine_Should_Convert_TrueDate_To_TimeStamp():

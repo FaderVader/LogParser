@@ -125,6 +125,12 @@ The BST is currently only used for sorting the results according to time. We use
 
 
 
+### Testing ###
+
+Test relies on the package **pytest**, so ensure this is installed. From project-directory in terminal, type `pytest` to execute the current test-suite.
+
+
+
 ### Next Step ###
 
 **Log Acquisition**
