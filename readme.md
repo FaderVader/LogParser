@@ -73,7 +73,7 @@ The functionality of LogParser is manifested through a number of modules and cla
 
 ### Running LogParser ###
 
-LogParser does not rely on OS-specific libraries, and can be executed on *nix/windows system, by cloning the repository to your local machine, opening a terminal to the directory and executing python with `shell.py` as argument.
+LogParser does not rely on OS-specific libraries, and can be executed on *nix/windows system, by cloning the repository to your local machine, opening a terminal to the directory and executing python from `/src` :   `python -m Shell` .
 
 **How to use**
 
@@ -127,7 +127,9 @@ The BST is currently only used for sorting the results according to time. We use
 
 ### Testing ###
 
-Test relies on the package **pytest**, so ensure this is installed. From project-directory in terminal, type `pytest` to execute the current test-suite.
+**Unit Tests**
+
+Unit testing relies on the package **pytest**, so ensure this is installed. From root of project-directory (in terminal), type `pytest` to execute the current test-suite.
 
 
 
