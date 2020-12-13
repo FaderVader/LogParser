@@ -1,4 +1,5 @@
 from Types import Terminator as Terminator
+from Utils import TermUtil as TermUtil
 import re
 
 
@@ -79,13 +80,9 @@ class SearchTrie:
     """
     def __init__(self):
         self.root = Node()
-        self._sep = '.'  # pointer elements delimimiter
-
-    def pointer_as_string(self, pointer):
-        return f'{pointer.client}{self._sep}{pointer.date}{self._sep}{pointer.linenumber}'
 
     def AddPointer(self, pointer):
-        pointer_as_string = self.pointer_as_string(pointer)
+        pointer_as_string = TermUtil.ToString(pointer)
 
         def inner(pointer, node):
             if len(pointer) == 0:
@@ -106,7 +103,7 @@ class SearchTrie:
         """
         Returns the number of hits accumulated for the specified pointer-parameter.
         """
-        currentPointer = self.pointer_as_string(pointer)
+        currentPointer = TermUtil.ToString(pointer)
         currentNode = self.root
 
         while len(currentPointer) > 0:

@@ -24,7 +24,6 @@ class Query:
         trie = PrepareTrie()                       # setup the tries
         self.log_trie = trie.GetLogTrie()          # load log-trie
         self.all_files = trie.GetStructuredLogs()  # get the files in structured format
-        self.search_trie = None
 
     def buildSearchTrie(self, *args):
         """
@@ -36,7 +35,7 @@ class Query:
 
         for arg in args_as_list:            
             word = arg.lower()  # all trie words are lowercased
-            matches = self.log_trie.FindWord(word) # get pointer to matches for every word
+            matches = self.log_trie.FindWord(word)  # get pointers to matches for every word
 
             # build search-trie of pointers - terminator accumulates hit-count
             [self.search_trie.AddPointer(match) for match in matches]

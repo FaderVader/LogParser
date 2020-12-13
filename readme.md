@@ -35,7 +35,7 @@ The application is accessed via a command line interface, used for building quer
 
 **Internal data representation**
 
-All loaded log-files are contained in a single datastructure, consisting of nested dictionarys and lists. \
+All loaded log-files are contained in a single datastructure, consisting of nested dictionary's and lists. \
 The filename of the logs are indicative of this structure:
 
 *GalaxySiteSelector-AX82017-20201001.log*              (appname-client-date.extension)
@@ -107,15 +107,15 @@ From the prompt, you add the query-components that you need:
 
 2 discreet tries are used in LogParser. Tries/LogTrie contains pointers to every occurence of any word found in any log-file. Tries/SearchTrie is used for keeping track of word-hits when searching for multiple words. 
 
-**LogTrie** uses Terminators for word-boundary demarcation. A Terminator defines a reference to the originating client, the date of the logfile, and the line where the match was found. The terminator is serialized, and multiple hits are concatenated.
+**LogTrie** uses Terminators for word-boundary demarcation. A Terminator defines a reference to the originating client, the date of the logfile, and the line where the match was found. The terminators are stored in a list, and multiple hits are appended ( See [wiki](https://github.com/FaderVader/LogParser/wiki/LogTrie#logtrie-) ).
 
-**SearchTrie** uses same methodology, only the terminators are integers.
+**SearchTrie** uses same methodology, only the terminators are integers ( see [wiki](https://github.com/FaderVader/LogParser/wiki/SearchTrie-&-BinarySearchTree#searchtrie-) ).
 
 
 
 **Binary Search Tree**
 
-The BST is currently only used for sorting the results according to time. We use the In Order traversal of tree-nodes to acquire the sorted set.
+The BST is currently only used for sorting the results according to time. We use the In Order traversal of tree-nodes to acquire the sorted set  ( see [wiki](https://github.com/FaderVader/LogParser/wiki/SearchTrie-&-BinarySearchTree#searchtrie-) ).
 
 
 

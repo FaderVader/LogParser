@@ -19,8 +19,8 @@ class PrepareTrie:
         for client in self.fileStructure:
             for log in self.fileStructure[client]:
                 log_file = self.all_files[client][log]
-                value = Terminator(client, log, None, None)
-                trie.AddLog(log_file, value)
+                terminator = Terminator(client, log, None, None)
+                trie.AddLog(log_file, terminator)
         self.log_trie = trie
 
     def GetLogTrie(self):
