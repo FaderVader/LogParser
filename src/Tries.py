@@ -42,10 +42,8 @@ class LogTrie:
     def addLine(self, line, terminator):
         pattern = r'[()\[\]"\.:,]'  # filter out these characters
         cleaned_line = re.sub(pattern, ' ', line.lower())
-
         words = cleaned_line.split()
-        for word in words:
-            self.addWord(word, terminator)
+        [self.addWord(word, terminator) for word in words]
 
     def AddLog(self, logFile, terminator=Terminator('*', '*', '*', None)):
         """
