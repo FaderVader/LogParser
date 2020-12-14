@@ -24,9 +24,8 @@ class Shell(cmd.Cmd):
         """
         Build a set of variables, based on the look-up dictionary of methods defined in QueryParser
         """
-        var_names = self.queryParser.query_methods  # get the keys from the dict
-        for var in var_names:  
-            setattr(self, var, None)  # Initialize to None
+        var_names = self.queryParser.query_methods  # get the keys from Query
+        [setattr(self, var, None) for var in var_names]  # Initialize to None
 
     def catch(func):
         """
