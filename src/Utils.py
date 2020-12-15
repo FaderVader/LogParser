@@ -62,9 +62,7 @@ class TermUtil:
         pointers_list = []
 
         parts = pointers_string.split(h)[1:]
-        for part in parts:
-            terminator = TermUtil.ToTerminator(f'@{part}')  # we must re-add header to stripped part
-            pointers_list.append(terminator)
+        pointers_list = [TermUtil.ToTerminator(f'@{part}') for part in parts]
         return pointers_list
 
     @staticmethod
@@ -104,11 +102,12 @@ class EpochTimeUtil:
         t_delta_int = int(t_delta_string) / EpochTimeUtil.delta_factor
         return t_delta_int
 
+
 if __name__ == "__main__":
-    # term = Terminator("Client", "19700101", "888", None)
-    # as_string = TermUtil.ToString(term)
-    # as_term = TermUtil.ToTerminator(as_string)
-    # print(as_string, as_term)
+    term = Terminator("Client", "19700101", "888", None)
+    as_string = TermUtil.ToString(term)
+    as_term = TermUtil.ToTerminator(as_string)
+    print(as_string, as_term)
 
     terminators = []
     terminators.append(Terminator("client1", "date1", 1, None))
