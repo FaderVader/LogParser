@@ -2,6 +2,7 @@ from QueryParser import QueryParser
 import cmd
 import sys
 from os import path as check_path
+import os
 import datetime
 
 
@@ -10,7 +11,9 @@ class Shell(cmd.Cmd):
     Main entry point for LogParser. Starts the interactive query-shell.
     """
     def __init__(self):
-        super().__init__()       
+        super().__init__()      
+        self.clear()  # we want a nice, clean terminal
+
         print("Loading all log-files ....")
         self.prompt = "LogParser> "
 
@@ -90,6 +93,25 @@ class Shell(cmd.Cmd):
         except:
             print("Failed to execute query.")
 
+    def clear(self):
+        platforms = {'linux': 'Linux', 'linux1': 'Linux', 'darwin': 'OS X', 'win32': 'Windows'}
+        current_os = sys.platform
+
+        if current_os not in platforms:
+            return
+
+        actual_platform = platforms[current_os]
+        if actual_platform == "Linux":
+            command = 'clear'
+
+        if actual_platform == "OS X":
+            command = 'clear'
+
+        if actual_platform == "Windows":
+            command = "cls"
+
+        os.system(command)
+
     # cli commands - query build
     @catch
     def do_startend(self, args):
@@ -163,6 +185,6 @@ class Shell(cmd.Cmd):
         self.execute_query(final_query)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     shell = Shell()
     shell.cmdloop()
