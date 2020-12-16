@@ -79,7 +79,7 @@ class Shell(cmd.Cmd):
             query_list = {var: self.__getattribute__(var) for var in query_methods if self.__getattribute__(var) is not None}
 
         except AttributeError as e:
-            raise AttributeError(f'Build.build_query(): failed to parse key/value set: {e}')
+            raise AttributeError(f'Shell.build_query(): failed to parse key/value set: {e}')
 
         return query_list
 
